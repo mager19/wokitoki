@@ -1,0 +1,42 @@
+/* WoKiToKi box figure. Colours come from --wk-* tokens (see palette.mjs); nothing here is a raw colour
+   except the transparent and white helpers. */
+.wk { --wk-ring: var(--wk-red); --wk-on: 0; }
+.wk .iso-plate { background: var(--anatomy-card); box-shadow: 0 0 0 1px var(--anatomy-faint); padding: 52px 24px 92px; overflow: hidden; }
+.wk-stage { position: relative; outline: none; touch-action: pan-y; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.wk-stage:focus-visible { outline: 1px solid var(--anatomy-mid); outline-offset: 6px; }
+.wk-hole { fill: var(--wk-hole); stroke: none; }
+.wk-hole.wk-bore { fill: color-mix(in oklab, var(--wk-shell), var(--wk-shadow) 58%); }
+.wk-window { fill: var(--wk-window); stroke: none; opacity: .92; }
+.wk-glow { fill: var(--wk-ring); stroke: none; opacity: calc(var(--wk-on) * .62); mix-blend-mode: multiply; }
+.wk-led { fill: var(--wk-ring); stroke: none; opacity: var(--wk-on); }
+.wk-surround { fill: color-mix(in oklab, var(--wk-cone), #000 22%); stroke: none; }
+.wk-cone { fill: var(--wk-cone); stroke: none; }
+.wk-floor { fill: color-mix(in oklab, var(--wk-base), #000 9%); }
+.wk [data-cap] { transition: none; }
+.wk [data-cap] { cursor: pointer; }
+.wk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* selection: the chosen assembly takes the lit accent, the rest step back */
+.wk-stage[data-focus] .it:not([data-on]) { filter: saturate(.35) opacity(.999); }
+.wk-stage[data-focus] .it:not([data-on]) .iso-line { stroke: var(--anatomy-faint); }
+.it[data-on] .iso-edge { stroke: var(--anatomy-lit); }
+
+.wk-controls { position: absolute; left: 20px; right: 20px; bottom: 44px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.wk-btn { font: 600 12px/1 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: .02em; color: var(--anatomy-strong, var(--wk-ink)); background: transparent; border: 1px solid var(--anatomy-faint); border-radius: 999px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+.wk-btn:hover, .wk-btn:focus-visible { border-color: var(--anatomy-mid); outline: none; }
+.wk-btn[aria-pressed="true"] { border-color: var(--wk-accent); color: var(--wk-accent); }
+.wk-btn-red::before, .wk-btn-green::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--wk-red); }
+.wk-btn-green::before { background: var(--wk-green); }
+.wk-btn[data-active] { border-color: var(--anatomy-mid); }
+.wk-parts { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.wk-part { font: 12px/1.3 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--anatomy-text); background: transparent; border: 0; border-radius: 6px; padding: 4px 8px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; }
+.wk-part:hover, .wk-part[data-on], .wk-part:focus-visible { color: var(--anatomy-strong); background: color-mix(in oklab, var(--anatomy-faint), transparent 55%); outline: none; }
+.wk-num { font-family: var(--anatomy-mono); font-size: 10.5px; color: var(--wk-accent); }
+.wk .iso-plate-corner[data-corner="readout"] { max-width: 60%; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 560px) {
+  .wk .iso-plate { padding: 48px 12px 110px; }
+  .wk-controls { left: 12px; right: 12px; bottom: 50px; }
+  .wk .iso-plate-corner[data-corner="hint"] { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .wk-glow, .wk-led { transition: none; } }
+.wk-annulus > .iso-fill, .wk-annulus > .iso-edge { fill-rule: evenodd; }
