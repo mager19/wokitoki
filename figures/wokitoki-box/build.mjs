@@ -1,6 +1,7 @@
 // WoKiToKi box: an isometric exploded-view figure built with the anatomy kit.
 // node build.mjs            -> wokitoki-box.html (dark) + wokitoki-box-light.html + export/wokitoki-exploded.svg
 // node build.mjs --landing  -> landing/ only: the Spanish, landing-themed embeddable fragment + module
+// node build.mjs --sim-box  -> landing/sim-box.js only: the assembled box, static, for the "Pruébala" simulator
 // node build.mjs --audit    -> also proves the geometry (clearances, depth order, supports, explode frames)
 //
 // Units are millimetres of the real object: x along the 170 mm length, y across the 110 mm depth, z up.
@@ -16,6 +17,8 @@ import { figureCss, landingCss } from "./palette.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LANDING = process.argv.includes("--landing"); // add-only mode: the defaults below are unchanged without it
+const SIM_BOX = process.argv.includes("--sim-box"); // add-only mode: the assembled box in the landing style
+const LANDING_STYLE = LANDING || SIM_BOX; // same camera and scale as the landing figure, so both read as one object
 
 // ---------------------------------------------------------------- truth
 // Real parts (datasheet sizes, mm). The box itself is a concept: designed, not built.
@@ -64,13 +67,13 @@ const PIECES = {
 // Landing edition: a compact explode, so the box reads as one box being opened rather than a tall tower.
 // (The default/brochure path keeps the moves above untouched.)
 const COMPACT = { keys: 220, shell: 194, lid: 94, brain: 50, base: 0, screws: -32 };
-if (LANDING) for (const [id, z] of Object.entries(COMPACT)) PIECES[id].move = [0, 0, z];
+if (LANDING_STYLE) for (const [id, z] of Object.entries(COMPACT)) PIECES[id].move = [0, 0, z];
 const STAGGER = ["screws", "keys", "shell", "lid", "brain", "base"];
 const SPRING = { stagger: 0.07, stiffness: 46, damping: 12.6, substeps: 4 };
 
 // ---------------------------------------------------------------- camera
 const W = 600;
-const H = LANDING ? 760 : 900;
+const H = LANDING_STYLE ? 760 : 900;
 const AZIMUTH = 54;
 const ELEVATION = 32;
 const lifted = (pts, dz) => pts.map(([x, y, z]) => [x, y, z + dz]);
@@ -534,7 +537,7 @@ const caption =
   "A concept, designed but not built. The box is 170 × 110 × 50 mm, the size of a paperback lying flat. Two 30 mm arcade buttons go through the top shell; under it sit a 40 mm, 4 Ω 3 W speaker behind the grille, a ring of eight WS2812B LEDs under the frosted window and an INMP441 I2S microphone behind the pinhole. An ESP32-S3 board (16 MB flash, 8 MB PSRAM, WiFi) drives a MAX98357A class-D amplifier with a limiter, and takes its power through USB-C in the base. No screen, no words: red talks, green listens. The battery is still undecided, so it is left out.";
 const plate = `<figure class="iso-figure wk"><div class="iso-plate">${corners}${stage}${controls}</div><figcaption class="iso-legend"><span class="wk-parts">${PARTS}</span><span class="iso-caption">${caption}</span></figcaption></figure>`;
 
-if (!LANDING) for (const theme of ["dark", "light"]) {
+if (!LANDING_STYLE) for (const theme of ["dark", "light"]) {
   const page = k.pageHtml({ title: "The box · exploded", theme, body: `<style>${CSS}</style>${plate}`, script: kitScript + LIVE, width: 720 });
   const name = theme === "light" ? "wokitoki-box-light.html" : "wokitoki-box.html";
   writeFileSync(join(HERE, name), page);
@@ -542,7 +545,7 @@ if (!LANDING) for (const theme of ["dark", "light"]) {
 }
 
 // ---------------------------------------------------------------- static print export: exploded pose, light theme, no card
-if (!LANDING) {
+if (!LANDING_STYLE) {
   const apart = groups(true).sort((a, b) => a.key - b.key);
   const css = k.ISO_CSS + readFileSync(join(HERE, "wokitoki.css"), "utf8") + figureCss({ live: false, scope: ".wk" });
   // crop the viewBox to the drawing in the apart pose
@@ -565,6 +568,7 @@ if (!LANDING) {
 }
 
 if (LANDING) buildLanding();
+if (SIM_BOX) buildSimBox();
 
 console.log(`${R.items.length} items · ${CABLES.length} cables · scale ${KS.toFixed(3)} px/mm`);
 const named = (re) => (name) => re.test(name);
@@ -578,6 +582,36 @@ const ALLOW = [
   [named(/^nut\./), named(/^shell$/)],
 ];
 A.auditOrExit(R, P, { allow: ALLOW });
+
+// CSS scoped to a fragment's root: rules on .iso itself land on the root, everything else under it.
+// Dark-theme rules can never match a light fragment, so they are dropped.
+function scopeCssTo(ROOT, css) {
+  const dark = (sel) => sel.includes(':not([data-theme="light"])') || sel.includes('[data-theme="dark"]');
+  const scopeSel = (sel) => (sel.startsWith(ROOT) ? sel : /^\.iso(?![\w-])/.test(sel) ? ROOT + sel : `${ROOT} ${sel}`);
+  function scopeCss(css) {
+    css = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    let out = "";
+    let i = 0;
+    for (;;) {
+      const open = css.indexOf("{", i);
+      if (open < 0) break;
+      const head = css.slice(i, open).trim();
+      let depth = 1;
+      let j = open + 1;
+      for (; depth && j < css.length; j++) depth += css[j] === "{" ? 1 : css[j] === "}" ? -1 : 0;
+      const body = css.slice(open + 1, j - 1);
+      if (/^@(media|supports)/.test(head)) out += `${head}{${scopeCss(body)}}`;
+      else if (head.startsWith("@")) out += `${head}{${body}}`;
+      else {
+        const sels = head.split(",").map((s) => s.trim()).filter((s) => !dark(s));
+        if (sels.length) out += `${sels.map(scopeSel).join(",")}{${body.trim()}}`;
+      }
+      i = j;
+    }
+    return out;
+  }
+  return scopeCss(css);
+}
 
 // ---------------------------------------------------------------- landing edition (--landing)
 // A Spanish, landing-themed copy of the live figure, written as an embeddable fragment (no iframe):
@@ -657,32 +691,7 @@ for (const el of root.querySelectorAll(".wk-label")) {
   const LABEL_ES =
     "Render conceptual en vista isométrica desarmada de un dispositivo de voz para niños: una caja rectangular de esquinas redondeadas, del tamaño de un libro de bolsillo, con la tapa superior color hueso y la base amarillo banano. De arriba abajo: un botón grande rojo y uno verde; la tapa superior con la rejilla redonda del parlante, una ventana de luz esmerilada y el orificio del micrófono; bajo la tapa, un parlante pequeño, un anillo de luces de colores, el micrófono y las dos tuercas de los botones; un pequeño computador con WiFi, su entrada de carga y cables al parlante y a los botones; la bandeja base sobre cuatro patas de caucho; y cuatro tornillos por debajo.";
 
-  // CSS scoped to the fragment's root: rules on .iso itself land on the root, everything else under it.
-  // Dark-theme rules can never match the light fragment, so they are dropped.
-  const dark = (sel) => sel.includes(':not([data-theme="light"])') || sel.includes('[data-theme="dark"]');
-  const scopeSel = (sel) => (sel.startsWith(ROOT) ? sel : /^\.iso(?![\w-])/.test(sel) ? ROOT + sel : `${ROOT} ${sel}`);
-  function scopeCss(css) {
-    css = css.replace(/\/\*[\s\S]*?\*\//g, "");
-    let out = "";
-    let i = 0;
-    for (;;) {
-      const open = css.indexOf("{", i);
-      if (open < 0) break;
-      const head = css.slice(i, open).trim();
-      let depth = 1;
-      let j = open + 1;
-      for (; depth && j < css.length; j++) depth += css[j] === "{" ? 1 : css[j] === "}" ? -1 : 0;
-      const body = css.slice(open + 1, j - 1);
-      if (/^@(media|supports)/.test(head)) out += `${head}{${scopeCss(body)}}`;
-      else if (head.startsWith("@")) out += `${head}{${body}}`;
-      else {
-        const sels = head.split(",").map((s) => s.trim()).filter((s) => !dark(s));
-        if (sels.length) out += `${sels.map(scopeSel).join(",")}{${body.trim()}}`;
-      }
-      i = j;
-    }
-    return out;
-  }
+  const scopeCss = (css) => scopeCssTo(ROOT, css);
   const css = scopeCss(k.ISO_CSS + readFileSync(join(HERE, "wokitoki.css"), "utf8") + "\n" + figureCss({ live: true }) + "\n" + readFileSync(join(HERE, "landing.css"), "utf8")).replace(/\biso-(flow|pulse)\b/g, "wk-iso-$1") + landingCss(ROOT);
 
   let live = readFileSync(join(HERE, "live.js"), "utf8");
@@ -763,4 +772,70 @@ export { start };
   writeFileSync(join(vendor, "wokitoki-figure.html"), html);
   writeFileSync(join(vendor, "wokitoki-figure.js"), js);
   console.log("copied both to landing/vendor/wokitoki-figure/");
+}
+
+// ---------------------------------------------------------------- simulator box (--sim-box)
+// The assembled box, drawn exactly as the landing figure draws it (same camera, outlines and flat finish),
+// as a static SVG for the "Pruébala" simulator. The simulator drives three hooks:
+//   .sim-light (data-mode, --lc)  the round light face, painted over the frosted window
+//   .sim-cap[data-cap=red|green]  the two button caps (pressed: they sink and their top darkens)
+//   hits.red / hits.green         where the caps sit, in % of the drawing, for the real <button> overlays
+// Parts hidden inside the closed box (under the lid, the brain, the screws, the button bodies) are left out.
+function buildSimBox() {
+  const ROOT = ".wk-simbox";
+  const hidden = /^(button\.(red|green)\.(housing|switch|tab)|base\.(boss|standoff))/;
+  const keep = R.items.filter((item) => ["base", "shell", "keys"].includes(item.piece) && !hidden.test(item.name));
+
+  const glowD = k.ring(RING[0], RING[1], 23, TOP, P, 72);
+  const faceD = k.ring(RING[0], RING[1], 17, TOP, P, 72);
+  const shineD = k.ring(RING[0] - 5, RING[1] + 4, 5.5, TOP, P, 36);
+  const light = `<g class="sim-light" data-mode="off"><path class="sim-light__glow" filter="url(#wk-sim-glow)" d="${glowD}"/><path class="sim-light__face" d="${faceD}"/><path class="sim-light__shine" d="${shineD}"/></g>`;
+
+  let body = keep.map((item) => `<g class="it" data-piece="${item.piece}">${item.svg}</g>`).join("");
+  const glowTag = /<path class="wk-glow" d="[^"]*"\/>/g;
+  const n = body.match(glowTag)?.length ?? 0;
+  if (n !== 1) throw new Error(`sim-box: expected one light window, found ${n}`);
+  body = body.replace(glowTag, () => light);
+  for (const id of ["red", "green"]) {
+    const tag = `<g data-cap="${id}">`;
+    if (body.split(tag).length !== 2) throw new Error(`sim-box: expected one ${id} cap`);
+    body = body.replace(tag, `<g class="sim-cap sim-cap--${id}" data-cap="${id}">`);
+  }
+  // ids must not clash with the landing figure on the same page
+  body = (back.join("") + body).replace(/id="wk-/g, 'id="wk-sim-').replace(/url\(#wk-(?!sim-)/g, "url(#wk-sim-");
+  const defs = `<defs><filter id="wk-sim-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter></defs>`;
+
+  // crop to the closed box (halo and glow included)
+  const circ = ([x, y], r, z, n = 48) => Array.from({ length: n }, (_, i) => [x + r * Math.cos((i / n) * 2 * Math.PI), y + r * Math.sin((i / n) * 2 * Math.PI), z]);
+  const pts = [...k.boxCorners(OUT, -3, TOP), ...Object.values(BTN).flatMap((c) => circ(c, 17, TOP + 7.4))].map(at);
+  const pad = 14;
+  const x0 = Math.min(...pts.map((p) => p[0])) - pad;
+  const y0 = Math.min(...pts.map((p) => p[1])) - pad;
+  const vw = Math.max(...pts.map((p) => p[0])) + pad - x0;
+  const vh = Math.max(...pts.map((p) => p[1])) + pad - y0;
+  const pct = (v) => Math.round(v * 10000) / 100;
+  const hits = {};
+  for (const [id, c] of Object.entries(BTN)) {
+    const s = [...circ(c, 17, TOP), ...circ(c, 17, TOP + 2.4), ...circ(c, 12, TOP + 7.4)].map(at);
+    const [a, b] = [Math.min(...s.map((p) => p[0])), Math.max(...s.map((p) => p[0]))];
+    const [u, v] = [Math.min(...s.map((p) => p[1])), Math.max(...s.map((p) => p[1]))];
+    hits[id] = { cx: pct(((a + b) / 2 - x0) / vw), cy: pct(((u + v) / 2 - y0) / vh), w: pct((b - a) / vw), h: pct((v - u) / vh) };
+  }
+  const press = unit([0, 0, -2.4]);
+
+  const css =
+    scopeCssTo(ROOT, k.ISO_CSS + readFileSync(join(HERE, "wokitoki.css"), "utf8") + "\n" + figureCss({ live: true }) + "\n" + readFileSync(join(HERE, "landing.css"), "utf8").replaceAll(".wk-landing", ROOT)).replace(/\biso-(flow|pulse)\b/g, "wk-iso-$1") +
+    landingCss(ROOT);
+  const vb = [x0, y0, vw, vh].map(f2).join(" ");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" class="iso-svg wk-svg" viewBox="${vb}" aria-hidden="true" focusable="false">${defs}${body}</svg>`;
+  const html = `<div class="wk-simbox iso" data-theme="light" style="--sim-press:${f2(press[1])}px"><style>${css}</style><div class="wk" data-theme="light">${svg}</div></div>`;
+  const js = `// Generated by figures/wokitoki-box/build.mjs --sim-box. Do not edit: edit build.mjs and rebuild.\n// The assembled box for the "Pruébala" simulator: markup (with its scoped CSS), and where the two caps sit.\nexport const SIM_BOX = ${JSON.stringify({ html, hits, ratio: f2(vw / vh) })};\n`;
+
+  const dir = join(HERE, "landing");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "sim-box.js"), js);
+  const vendor = join(HERE, "..", "..", "landing", "vendor", "wokitoki-figure");
+  mkdirSync(vendor, { recursive: true });
+  writeFileSync(join(vendor, "sim-box.js"), js);
+  console.log("wrote landing/sim-box.js + landing/vendor/wokitoki-figure/sim-box.js", `${(js.length / 1024).toFixed(0)} KB`, `viewBox ${vb}`, JSON.stringify(hits));
 }

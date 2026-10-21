@@ -2,9 +2,6 @@
 
 #sim-mount {
   --sim-amber: #F2A31B;
-  --sim-shell: #FBF7EC;
-  --sim-shell-edge: #E6DCC4;
-  --sim-dark: #1F2C26;
   min-height: 0;
   padding: clamp(24px, 4vw, 48px);
   background: var(--cream-deep);
@@ -29,116 +26,73 @@
 }
 .sim__stage { display: grid; place-items: center; }
 
-/* ---------- The drawn box (no text on it) ---------- */
-.sim-box { width: min(100%, 340px); }
+/* ---------- The drawn box (no text on it) ----------
+   The isometric box from the figure (vendor/wokitoki-figure/sim-box.js, built by
+   figures/wokitoki-box/build.mjs --sim-box). Its light and caps are driven here;
+   the real buttons are transparent and sit exactly over the caps. */
+.sim-box { position: relative; width: min(100%, 460px); }
+.sim-box .wk-simbox, .sim-box .wk { height: 100%; }
+.sim-box .iso-svg { width: 100%; height: 100%; }
 
-.sim-box__shell {
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  justify-items: center;
-  gap: clamp(22px, 5vw, 30px);
-  padding: 30px 26px 0;
-  border-radius: 40px;
-  background: var(--sim-shell);
-  box-shadow:
-    inset 0 -2px 0 var(--sim-shell-edge),
-    0 28px 44px -24px rgb(22 51 43 / 0.5),
-    0 6px 14px -6px rgb(22 51 43 / 0.25);
+/* The round light: off shows the frosted window; lit, the face takes --lc and glows. */
+.sim-light { --lc: transparent; }
+.sim-light__face, .sim-light__glow, .sim-light__shine {
+  stroke: none;
+  opacity: 0;
+  transition: opacity 0.18s var(--ease-out);
 }
-
-.sim-box__bezel {
-  display: grid;
-  place-items: center;
-  width: 92px; height: 92px;
-  border-radius: 50%;
-  background: var(--sim-dark);
-  box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.5), 0 1px 0 #fff;
-}
-
-.sim-light {
-  --lc: transparent;
-  width: 58px; height: 58px;
-  border-radius: 50%;
-  background: #2E3D36;
-  box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.45);
-  transition: background-color 0.18s var(--ease-out), box-shadow 0.18s var(--ease-out);
-}
-.sim-light:not([data-mode="off"]) {
-  background: var(--lc);
-  box-shadow:
-    inset 0 -4px 8px rgb(0 0 0 / 0.18),
-    inset 0 3px 6px rgb(255 255 255 / 0.35),
-    0 0 26px 6px color-mix(in srgb, var(--lc) 55%, transparent);
-}
+.sim-light__face { fill: var(--lc); }
+.sim-light__glow { fill: var(--lc); }
+.sim-light__shine { fill: #fff; }
+.sim-light:not([data-mode="off"]) .sim-light__face { opacity: 1; }
+.sim-light:not([data-mode="off"]) .sim-light__glow { opacity: 0.85; }
+.sim-light:not([data-mode="off"]) .sim-light__shine { opacity: 0.4; }
 .sim-light[data-mode="pulse"] { animation: sim-pulse 0.7s ease-in-out infinite; }
 .sim-light[data-mode="breathe"] { animation: sim-breathe 3.4s ease-in-out infinite; }
-.sim-light[data-mode="flash"] { animation: sim-flash 0.8s var(--ease-out) 1 both; }
+.sim-light[data-mode="flash"] {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sim-flash 0.8s var(--ease-out) 1 both;
+}
 
 @keyframes sim-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.35; }
 }
 @keyframes sim-breathe {
-  0%, 100% { opacity: 0.4; filter: saturate(0.8); }
-  50% { opacity: 1; filter: saturate(1.1); }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 @keyframes sim-flash {
-  0% { opacity: 1; transform: scale(1.18); }
+  0% { opacity: 1; transform: scale(1.12); }
   100% { opacity: 1; transform: scale(1); }
 }
 
-.sim-box__buttons {
-  display: flex;
-  justify-content: center;
-  gap: clamp(18px, 6vw, 30px);
-}
-.sim-box__socket {
-  display: grid;
-  place-items: center;
-  width: clamp(104px, 30vw, 118px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--sim-dark);
-  box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.5), 0 1px 0 #fff;
-}
+/* Caps: pressed, they sink along the iso vertical and their top darkens a little. */
+#sim-mount .sim-cap[data-cap] { transition: transform 0.08s var(--ease-out); }
+#sim-mount .sim-cap.is-pressed { transform: translateY(var(--sim-press, 4px)); }
+#sim-mount .sim-cap.is-pressed .iso-top { fill: color-mix(in oklab, var(--anatomy-top), #000 16%); }
 
+/* The real controls, laid over the caps (position from SIM_BOX.hits). */
 .sim-btn {
-  --b: var(--btn-red);
-  width: 86%;
-  aspect-ratio: 1;
+  position: absolute;
+  min-width: 48px;
+  min-height: 48px;
   padding: 0;
   border: 0;
   border-radius: 50%;
+  background: transparent;
   cursor: pointer;
-  background: radial-gradient(circle at 36% 30%, color-mix(in srgb, var(--b) 70%, #fff) 0 14%, var(--b) 55%, color-mix(in srgb, var(--b) 78%, #000) 100%);
-  box-shadow: 0 8px 0 color-mix(in srgb, var(--b) 62%, #000), 0 12px 14px -4px rgb(0 0 0 / 0.45);
-  transform: translateY(-4px);
-  transition: transform 0.08s var(--ease-out), box-shadow 0.08s var(--ease-out);
+  transform: translate(-50%, -50%);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
 }
-.sim-btn--green { --b: var(--btn-green); }
-.sim-btn:hover { filter: brightness(1.06); }
-.sim-btn:active, .sim-btn.is-pressed {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 color-mix(in srgb, var(--b) 62%, #000), 0 4px 6px -2px rgb(0 0 0 / 0.45);
-}
 .sim-btn:focus-visible {
   outline: 4px solid var(--green-forest);
-  outline-offset: 5px;
-  border-radius: 50%;
-}
-
-.sim-box__base {
-  justify-self: stretch;
-  height: 34px;
-  margin-inline: -26px;
-  background: var(--fam-yellow);
-  box-shadow: inset 0 3px 0 rgb(0 0 0 / 0.06);
+  outline-offset: 3px;
 }
 
 /* ---------- Instructions, legend, controls (outside the box) ---------- */
@@ -216,5 +170,5 @@
   .sim-light[data-mode="pulse"],
   .sim-light[data-mode="breathe"],
   .sim-light[data-mode="flash"] { animation: none; opacity: 1; filter: none; transform: none; }
-  .sim-btn, .sim-light { transition: none; }
+  .sim-light__face, .sim-light__glow, .sim-light__shine, #sim-mount .sim-cap[data-cap] { transition: none; }
 }
