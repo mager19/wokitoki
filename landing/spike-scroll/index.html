@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WoKiToKi — spike scroll 3D (throwaway)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vollkorn:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#FCF5EE; --green:#0B785D; --banana:#F4DF97; --trunk:#462B0D; --ink:#2D1B10; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:'Source Sans 3',sans-serif; }
+  #stage { position:fixed; inset:0; width:100vw; height:100vh; display:block; z-index:0; }
+  #fallback { display:none; position:fixed; right:4vw; top:50%; transform:translateY(-50%); width:min(40vw,520px); z-index:0; }
+  .no-webgl #fallback { display:block; }
+  main { position:relative; z-index:2; pointer-events:none; }
+  section { min-height:110vh; display:flex; align-items:center; padding:0 6vw; }
+  .card { max-width:430px; background:rgba(252,245,238,.96); padding:28px 30px; border-radius:18px; pointer-events:auto; box-shadow:0 1px 0 rgba(70,43,13,.06); }
+  .tag { font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--green); font-weight:600; }
+  h1,h2 { font-family:'Vollkorn',serif; margin:.2em 0 .3em; line-height:1.05; }
+  h1 { font-size:clamp(44px,7vw,84px); }
+  h2 { font-size:clamp(28px,4vw,44px); }
+  .pill { background:var(--banana); padding:0 .25em; border-radius:.4em; }
+  p { font-size:18px; line-height:1.5; margin:.4em 0; }
+  .hint { opacity:.75; }
+  #labels { position:fixed; inset:0; z-index:1; pointer-events:none; }
+  .lbl { position:absolute; left:0; top:0; font-size:13px; font-weight:600; color:var(--ink); background:var(--paper); border:1px solid rgba(70,43,13,.18);
+         padding:3px 9px; border-radius:999px; white-space:nowrap; opacity:0; transition:opacity .25s; }
+  .lbl::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; vertical-align:middle; }
+  .note { position:fixed; bottom:12px; right:14px; z-index:3; font-size:12px; color:#5c4a3d; }
+  @media (max-width:760px){
+    section{ align-items:flex-end; padding:0 16px 5vh; min-height:120vh; }
+    .card{ max-width:none; padding:20px 22px; }
+    p{ font-size:16px; }
+    #fallback{ top:22vh; right:50%; transform:translateX(50%); width:80vw; }
+    .lbl{ font-size:11px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="stage" aria-hidden="true"></canvas>
+<img id="fallback" src="../../figures/wokitoki-box/export/wokitoki-exploded@300dpi.png" alt="Vista explotada conceptual de la caja WoKiToKi">
+<div id="labels" aria-hidden="true"></div>
+<main>
+  <section data-beat="hero"><div class="card"><div class="tag">Iniciativa de innovación · Simian</div><h1>WoKiToKi</h1><p>Su propia voz, <span class="pill">sin pantallas</span>.</p><p class="hint">Desplázate ↓</p></div></section>
+  <section data-beat="problem"><div class="card"><div class="tag">El problema</div><h2>Un niño que no lee no tiene cómo hablar solo con su familia.</h2><p>Depende de que un adulto le preste un teléfono, lo desbloquee y elija el contacto correcto.</p></div></section>
+  <section data-beat="idea"><div class="card"><div class="tag">La idea</div><h2>Una caja, una luz y <span class="pill">dos botones</span>.</h2><p>Lo que el niño dice llega como nota de voz al WhatsApp de su familia. Lo que la familia responde suena en la caja.</p></div></section>
+  <section data-beat="how"><div class="card"><div class="tag">Cómo funciona</div><h2>Rojo para hablar. Verde para escuchar.</h2><p>Mantiene el rojo y habla. Aprieta el verde: suena la melodía de la abuela y luego su voz. La luz “respira” en su color.</p></div></section>
+  <section data-beat="made"><div class="card"><div class="tag">Hecho a la medida</div><h2>Un desarrollo propio, pieza por pieza.</h2><p>ESP32-S3, micrófono digital, amplificador con limitador, parlante y un anillo de 8 luces. Servidor y simulador propios.</p></div></section>
+  <section data-beat="safe"><div class="card"><div class="tag">Protección</div><h2>Solo escucha cuando el botón está apretado.</h2><p>Sin escucha pasiva, sin pantalla, sin desconocidos: diseñado para que solo le hable su familia.</p></div></section>
+  <section data-beat="road"><div class="card"><div class="tag">Hoja de ruta</div><h2>Prueba de concepto <span class="pill">en curso</span>.</h2><p>Validado de punta a punta con WhatsApp real en el simulador. La caja está diseñada, aún no construida.</p></div></section>
+</main>
+<div class="note">Spike descartable · render conceptual</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+// ---------------------------------------------------------------- renderer
+const canvas = document.getElementById('stage');
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: devicePixelRatio < 2, alpha: true });
+} catch (e) {
+  document.documentElement.classList.add('no-webgl');
+  throw e;
+}
+const isPhone = matchMedia('(max-width: 760px)').matches;
+renderer.setPixelRatio(Math.min(devicePixelRatio, isPhone ? 1.5 : 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+const camera = new THREE.PerspectiveCamera(28, 1, 1, 6000);
+
+scene.add(new THREE.HemisphereLight(0xfff6ea, 0xd8c7a6, 0.45));
+const key = new THREE.DirectionalLight(0xfff3e2, 1.6);
+key.position.set(-260, 520, 300); key.castShadow = true;
+key.shadow.mapSize.set(isPhone ? 1024 : 2048, isPhone ? 1024 : 2048);
+key.shadow.radius = 6; key.shadow.bias = -0.0004;
+Object.assign(key.shadow.camera, { left:-260, right:260, top:260, bottom:-260, near:50, far:1500 });
+scene.add(key);
+const rim = new THREE.DirectionalLight(0xffffff, 0.8);
+rim.position.set(300, 180, -400); scene.add(rim);
+
+// ground that only receives the shadow
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.ShadowMaterial({ opacity: .14 }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -3; ground.receiveShadow = true; scene.add(ground);
+
+// ---------------------------------------------------------------- materials
+const phys = (c, o = {}) => new THREE.MeshPhysicalMaterial({ color: c, roughness: .5, metalness: 0, ...o });
+const M = {
+  shell: phys(0xFCF5EE, { roughness: .42, clearcoat: .35, clearcoatRoughness: .4 }),
+  base: phys(0xF4DF97, { roughness: .5, clearcoat: .2 }),
+  red: phys(0xD64033, { roughness: .18, clearcoat: 1, clearcoatRoughness: .08 }),
+  green: phys(0x228B3B, { roughness: .18, clearcoat: 1, clearcoatRoughness: .08 }),
+  redDim: phys(0xB5352A, { roughness: .35 }), greenDim: phys(0x1C7431, { roughness: .35 }),
+  black: phys(0x1d1a18, { roughness: .55 }), rubber: phys(0x2a2522, { roughness: .9 }),
+  pcb: phys(0x1d6b49, { roughness: .55, clearcoat: .4 }), pcbBlue: phys(0x1f3f6b, { roughness: .55, clearcoat: .4 }),
+  metal: phys(0xd2d0cc, { metalness: 1, roughness: .28 }), brass: phys(0xc9a24a, { metalness: 1, roughness: .35 }),
+  cone: phys(0x2b2724, { roughness: .85, side: THREE.DoubleSide }),
+  frost: phys(0xffffff, { roughness: .35, transmission: .6, thickness: 2, emissive: 0x000000 }),
+  wireR: phys(0xc0392b, { roughness: .6 }), wireK: phys(0x222222, { roughness: .6 }), wireY: phys(0xe0b33a, { roughness: .6 }), wireG: phys(0x2e8b57, { roughness: .6 }),
+};
+
+// ---------------------------------------------------------------- geometry helpers (mm; three y = up)
+// anatomy plan coords (ax, ay) -> three (x = ax, z = -ay)
+const P = (ax, ay) => [ax, -ay];
+function roundedRect(w, d, r, cx = 0, cz = 0) {
+  const s = new THREE.Shape(); const x = cx - w / 2, y = cz - d / 2;
+  s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+  s.lineTo(x + w, y + d - r); s.quadraticCurveTo(x + w, y + d, x + w - r, y + d);
+  s.lineTo(x + r, y + d); s.quadraticCurveTo(x, y + d, x, y + d - r);
+  s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y); return s;
+}
+const circlePath = (r, cx, cz) => { const p = new THREE.Path(); p.absarc(cx, cz, r, 0, Math.PI * 2, true); return p; };
+// extrude a plan shape (x,z) upward from y0 by h
+function slab(shape, y0, h, mat, bevel = 0) {
+  const g = new THREE.ExtrudeGeometry(shape, { depth: h - bevel * 2, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4, curveSegments: 24 });
+  g.rotateX(Math.PI / 2); g.translate(0, y0 + h - bevel, 0);
+  const m = new THREE.Mesh(g, mat); m.castShadow = m.receiveShadow = true; return m;
+}
+const cyl = (r, h, mat, seg = 40, rTop = r) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rTop, r, h, seg), mat); m.castShadow = m.receiveShadow = true; return m; };
+const box = (w, h, d, mat) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.castShadow = m.receiveShadow = true; return m; };
+
+// ---------------------------------------------------------------- real layout (from figures/wokitoki-box SPEC)
+const L = 170, W = 110, R = 16, WALL = 2.4, SPLIT = 14, TOP = 50, PLATE = TOP - 3;
+const SPK = P(-46, 0), RING = P(4, 0), MIC = P(4, 34);
+const BTN = { red: P(50, 26), green: P(50, -26) };
+
+const model = new THREE.Group(); scene.add(model);
+const groups = {};   // assemblies that explode
+const EXPLODE = { keys: 180, shell: 140, lid: 64, brain: 22, base: 0, screws: -26 };
+for (const k of Object.keys(EXPLODE)) { groups[k] = new THREE.Group(); model.add(groups[k]); }
+
+const CORNERS = [[-L/2 + 12, -W/2 + 12], [L/2 - 12, -W/2 + 12], [-L/2 + 12, W/2 - 12], [L/2 - 12, W/2 - 12]];
+// base tray: floor + hollow walls, screw posts, rubber feet, USB-C opening
+{
+  const g = groups.base;
+  g.add(slab(roundedRect(L, W, R), 0, 2.6, M.base, .8));
+  const wall = roundedRect(L, W, R); wall.holes.push(roundedRect(L - WALL * 2, W - WALL * 2, R - WALL));
+  g.add(slab(wall, 0, SPLIT, M.base, .6));
+  for (const [x, z] of CORNERS) {
+    const post = cyl(4, 11, M.base, 24); post.position.set(x, 7.5, z); g.add(post);
+    const foot = cyl(6, 3, M.rubber, 24); foot.position.set(x, -1.5, z); g.add(foot);
+  }
+  const usb = box(3, 3.4, 9.4, M.black); usb.position.set(L / 2 - .6, 10.4, 0); g.add(usb);
+}
+// screws (from below)
+for (const [x, z] of CORNERS) {
+  const s = new THREE.Group();
+  const head = cyl(3, 2, M.metal, 20); head.position.y = -4; s.add(head);
+  const shaft = cyl(1.4, 14, M.metal, 12); shaft.position.y = 4; s.add(shaft);
+  s.position.set(x, 0, z); groups.screws.add(s);
+}
+// top shell: hollow walls + top plate with real holes (buttons, light window, grille, mic pinhole)
+{
+  const g = groups.shell;
+  const wall = roundedRect(L, W, R); wall.holes.push(roundedRect(L - WALL * 2, W - WALL * 2, R - WALL));
+  g.add(slab(wall, SPLIT, TOP - SPLIT - 3, M.shell, .6));
+  const plate = roundedRect(L, W, R);
+  for (const c of Object.values(BTN)) plate.holes.push(circlePath(15, c[0], c[1]));
+  plate.holes.push(circlePath(9, RING[0], RING[1]));
+  plate.holes.push(circlePath(1, MIC[0], MIC[1]));
+  // speaker grille: hex pattern of 2.2 mm holes inside a 34 mm circle
+  for (let i = -6; i <= 6; i++) for (let j = -6; j <= 6; j++) {
+    const x = i * 5.4 + (j % 2 ? 2.7 : 0), z = j * 4.7;
+    if (Math.hypot(x, z) < 17) plate.holes.push(circlePath(1.1, SPK[0] + x, SPK[1] + z));
+  }
+  g.add(slab(plate, PLATE, 3, M.shell, .9));
+  const felt = cyl(18, .6, M.black, 40); felt.position.set(SPK[0], PLATE - .4, SPK[1]); g.add(felt);
+  const win = cyl(9, 2.2, M.frost, 40); win.position.set(RING[0], PLATE + 1.6, RING[1]); g.add(win); g.userData.win = win;
+}
+// buttons: cap + flange (on top) + threaded body + microswitch (below the plate)
+const caps = {}; const buttonGroups = {};
+for (const [name, [x, z]] of Object.entries(BTN)) {
+  const b = new THREE.Group(); const m = name === 'red' ? M.red : M.green; const dim = name === 'red' ? M.redDim : M.greenDim;
+  const flange = cyl(17, 3, dim, 48); flange.position.y = TOP + 1.5; b.add(flange);
+  const cap = new THREE.Group();
+  const capC = cyl(12, 6, m, 48); capC.position.y = 3; cap.add(capC);
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(12, 40, 12, 0, Math.PI * 2, 0, .45), m); dome.scale.y = .35; dome.position.y = 5.2; cap.add(dome);
+  cap.position.y = TOP + 3; b.add(cap); caps[name] = cap;
+  const body = cyl(14, 22, dim, 40); body.position.y = TOP - 11; b.add(body);
+  for (let k = 0; k < 7; k++) { const t = new THREE.Mesh(new THREE.TorusGeometry(14.2, .5, 6, 40), dim); t.rotation.x = Math.PI / 2; t.position.y = TOP - 4 - k * 2.6; b.add(t); }
+  const sw = box(19.8, 10.2, 6.4, M.black); sw.position.y = TOP - 27; b.add(sw);
+  for (const dx of [-6, 0, 6]) { const t = box(1, 6, 3, M.brass); t.position.set(dx, TOP - 35, 0); b.add(t); }
+  b.position.set(x, 0, z); groups.keys.add(b); buttonGroups[name] = b;
+}
+// under the lid: speaker, LED ring, mic board, button nuts
+const leds = [];
+{
+  const g = groups.lid;
+  const spk = new THREE.Group();
+  const rimR = new THREE.Mesh(new THREE.TorusGeometry(19, 1.4, 10, 48), M.black); rimR.rotation.x = Math.PI / 2; spk.add(rimR);
+  const cone = new THREE.Mesh(new THREE.CylinderGeometry(18.5, 7, 9, 48, 1, true), M.cone); cone.position.y = -4.5; spk.add(cone);
+  const dust = cyl(6, 1.2, M.black, 30); dust.position.y = -5; spk.add(dust);
+  const basket = cyl(12, 3, M.metal, 30); basket.position.y = -10.5; spk.add(basket);
+  const magnet = cyl(11, 6, M.black, 30); magnet.position.y = -15; spk.add(magnet);
+  spk.position.set(SPK[0], PLATE - 1.5, SPK[1]); g.add(spk);
+  const annulus = new THREE.Shape(); annulus.absarc(0, 0, 16, 0, Math.PI * 2, false); annulus.holes.push(circlePath(9, 0, 0));
+  const ring = slab(annulus, 0, 1.6, M.pcb); ring.position.set(RING[0], PLATE - 4, RING[1]); g.add(ring);
+  for (let i = 0; i < 8; i++) {
+    const a = i / 8 * Math.PI * 2;
+    const led = box(5, 1.6, 5, new THREE.MeshStandardMaterial({ color: 0xf6f3ee, roughness: .4, emissive: 0x000000 }));
+    led.position.set(RING[0] + Math.cos(a) * 12.5, PLATE - 1.6, RING[1] + Math.sin(a) * 12.5); g.add(led); leds.push(led);
+  }
+  const mic = cyl(7, 1.6, M.pcbBlue, 30); mic.position.set(MIC[0], PLATE - 1.5, MIC[1]); g.add(mic);
+  const micCan = box(4, 1.2, 3, M.metal); micCan.position.set(MIC[0], PLATE - .4, MIC[1]); g.add(micCan);
+}
+// brain: ESP32-S3 devkit + MAX98357A amp
+const brain = {};
+{
+  const g = groups.brain;
+  const esp = new THREE.Group();
+  esp.add(box(52, 1.6, 25.4, M.pcb));
+  const wroom = box(25.5, 3.1, 18, M.metal); wroom.position.set(-10, 2.3, 0); esp.add(wroom);
+  const ant = box(6, .4, 18, M.pcb); ant.position.set(-25.5, 1, 0); esp.add(ant);
+  const usb = box(7.35, 3.2, 8.94, M.metal); usb.position.set(22, 2.4, 0); esp.add(usb);
+  for (const s of [-1, 1]) for (let i = 0; i < 20; i++) { const pin = box(.7, 2.4, .7, M.brass); pin.position.set(-23.5 + i * 2.54, -1.6, s * 11.4); esp.add(pin); }
+  const chip = box(4, 1, 4, M.black); chip.position.set(10, 1.3, -6); esp.add(chip);
+  esp.position.set(56, 9, 0); g.add(esp); brain.esp = esp;
+  const amp = new THREE.Group(); amp.add(box(17.8, 1.6, 19.3, M.pcbBlue));
+  const ic = box(4, 1, 4, M.black); ic.position.set(-2, 1.3, 0); amp.add(ic);
+  const term = box(7, 6, 5, M.wireG); term.position.set(4.5, 3.8, 5); amp.add(term);
+  const c = P(-24 + 8.9, 20 + 9.65); amp.position.set(c[0], 9, c[1]); g.add(amp); brain.amp = amp;
+}
+
+// ---------------------------------------------------------------- live wires (rebuilt as parts move)
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const wireDefs = [
+  { from: () => brain.esp.localToWorld(V(-20, 1, 11)),  to: () => buttonGroups.red.localToWorld(V(-6, TOP - 38, 0)), mat: M.wireR },
+  { from: () => brain.esp.localToWorld(V(-16, 1, -11)), to: () => buttonGroups.green.localToWorld(V(-6, TOP - 38, 0)), mat: M.wireG },
+  { from: () => brain.esp.localToWorld(V(-24, 1, 4)),   to: () => groups.lid.localToWorld(V(RING[0] + 12, PLATE - 4, RING[1])), mat: M.wireY },
+  { from: () => brain.amp.localToWorld(V(4.5, 6, 5)),   to: () => groups.lid.localToWorld(V(SPK[0] + 6, PLATE - 18, SPK[1])), mat: M.wireK },
+  { from: () => brain.amp.localToWorld(V(-8, 1, -8)),   to: () => brain.esp.localToWorld(V(-22, 1, -11)), mat: M.wireK },
+];
+const wires = wireDefs.map(d => { const m = new THREE.Mesh(new THREE.BufferGeometry(), d.mat); m.castShadow = true; scene.add(m); return m; });
+function updateWires() {
+  wireDefs.forEach((d, i) => {
+    const a = d.from(), b = d.to(); const mid = a.clone().lerp(b, .5); const sag = Math.max(8, a.distanceTo(b) * .18);
+    const c1 = a.clone().lerp(mid, .6).add(V(0, -sag * .3, sag * .4));
+    const c2 = b.clone().lerp(mid, .6).add(V(0, -sag * .2, sag * .3));
+    wires[i].geometry.dispose(); wires[i].geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([a, c1, c2, b]), 28, .7, 6, false);
+  });
+}
+
+// glow sprite above the light window
+const glowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.35, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, depthTest: false, blending: THREE.NormalBlending }));
+glow.renderOrder = 10; glow.scale.set(46, 46, 1); glow.position.set(RING[0], TOP + 3, RING[1]); groups.shell.add(glow);
+
+// ---------------------------------------------------------------- labels (outside the drawing)
+const labelDefs = [
+  ['Botones arcade 30 mm', () => groups.keys.localToWorld(V(BTN.green[0], TOP + 10, BTN.green[1] - 20))],
+  ['Carcasa · rejilla y ventana de luz', () => groups.shell.localToWorld(V(-L / 2, TOP, -W / 2))],
+  ['Parlante 40 mm', () => groups.lid.localToWorld(V(SPK[0] - 20, PLATE - 14, SPK[1]))],
+  ['Anillo de 8 luces', () => groups.lid.localToWorld(V(RING[0] + 34, PLATE - 3, RING[1] - 30))],
+  ['Micrófono I2S', () => groups.lid.localToWorld(V(MIC[0] - 22, PLATE - 2, MIC[1] + 14))],
+  ['ESP32-S3', () => brain.esp.localToWorld(V(26, 2, -13))],
+  ['Amplificador', () => brain.amp.localToWorld(V(-9, 2, 10))],
+  ['Base · USB-C', () => groups.base.localToWorld(V(L / 2, 6, W / 2))],
+];
+const labelLayer = document.getElementById('labels');
+const labels = labelDefs.map(([t]) => { const el = document.createElement('div'); el.className = 'lbl'; el.textContent = t; labelLayer.appendChild(el); return el; });
+
+// ---------------------------------------------------------------- story: per-section keyframes
+// e = explode 0..1, az/el in rad, zoom = framing factor, ty = look-at height (mm)
+const KF = {
+  hero:    { e: 0, az: -.75, el: .52, zoom: 1.0,  ty: 25 },
+  problem: { e: 0, az: -.45, el: .46, zoom: 1.05, ty: 25 },
+  idea:    { e: 0, az: -.15, el: .62, zoom: .85,  ty: 35 },
+  how:     { e: 0, az: -.1,  el: .85, zoom: .9,   ty: 40 },
+  made:    { e: 1, az: -.55, el: .32, zoom: 1.0,  ty: 115 },
+  safe:    { e: 1, az: .35,  el: .38, zoom: 1.0,  ty: 115 },
+  road:    { e: 0, az: -.75, el: .52, zoom: 1.0,  ty: 25 },
+};
+const sections = [...document.querySelectorAll('section[data-beat]')];
+const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+const smooth = t => t * t * (3 - 2 * t);
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// story position 0..n-1: section i is "on" when its centre crosses the viewport centre
+function storyPos() {
+  const mid = innerHeight / 2; const centers = sections.map(s => { const r = s.getBoundingClientRect(); return r.top + r.height / 2; });
+  if (mid <= centers[0]) return 0;
+  for (let i = 0; i < centers.length - 1; i++) if (mid <= centers[i + 1]) return i + (mid - centers[i]) / (centers[i + 1] - centers[i]);
+  return centers.length - 1;
+}
+function sample(s) {
+  const i = Math.min(Math.floor(s), sections.length - 2);
+  const tt = smooth(clamp01((s - i - .3) / .4)); // hold each keyframe, blend in the middle 40%
+  const a = KF[sections[i].dataset.beat], b = KF[sections[i + 1].dataset.beat];
+  const o = {}; for (const k in a) o[k] = lerp(a[k], b[k], tt); return o;
+}
+
+const forced = /p=([\d.]+)/.exec(location.hash);
+const posNow = () => forced ? parseFloat(forced[1]) * (sections.length - 1) : storyPos();
+const cur = sample(posNow());
+function resize() {
+  const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h;
+  if (w > 760) camera.setViewOffset(w, h, -w * .2, 0, w, h); else camera.setViewOffset(w, h, 0, h * .2, w, h);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+const familyColors = [0xE46AA0, 0x3B82F6, 0x22A35A, 0xF28C28, 0x8B5CF6, 0xEAB308];
+const howIdx = sections.findIndex(x => x.dataset.beat === 'how');
+const order = ['screws', 'keys', 'shell', 'lid', 'brain', 'base'];
+const tmp = new THREE.Vector3(); const clock = new THREE.Clock();
+function frame() {
+  const t = clock.getElapsedTime();
+  const s = posNow();
+  const target = sample(s);
+  const k = reduce.matches ? 1 : .09;
+  for (const key in cur) cur[key] += (target[key] - cur[key]) * k;
+
+  // explode: staggered per assembly, eased; fully closed at e = 0
+  order.forEach((name, i) => { groups[name].position.y = EXPLODE[name] * smooth(clamp01(cur.e * 1.35 - i * .07)); });
+  model.position.y = cur.e * 30; // keeps the screws above the ground
+
+  // framing: fit the visible stack height and the box width to the usable viewport
+  const vFov = THREE.MathUtils.degToRad(camera.fov);
+  const usableW = innerWidth > 760 ? .55 : .92, usableH = innerWidth > 760 ? .8 : .5;
+  const needH = lerp(120, 330, cur.e) / usableH, needW = 240 / (usableW * camera.aspect);
+  const dist = Math.max(needH, needW) / (2 * Math.tan(vFov / 2)) * cur.zoom;
+  const az = cur.az + (reduce.matches ? 0 : Math.sin(t * .18) * .035);
+  camera.position.set(Math.sin(az) * dist * Math.cos(cur.el), Math.sin(cur.el) * dist + cur.ty, Math.cos(az) * dist * Math.cos(cur.el));
+  camera.lookAt(0, cur.ty, 0);
+
+  // "Cómo funciona": talk (red pressed, light red), then listen (green pressed, light breathes in a family colour)
+  const local = s - (howIdx - .5);
+  const talk = local > .2 && local < .55, listen = local >= .55 && local < 1.0;
+  caps.red.position.y = lerp(caps.red.position.y, TOP + (talk ? .5 : 3), .3);
+  caps.green.position.y = lerp(caps.green.position.y, TOP + (listen ? .5 : 3), .3);
+  const fam = familyColors[Math.floor(t / 2.4) % familyColors.length];
+  const color = talk ? 0xff3b2a : listen ? (reduce.matches ? familyColors[0] : fam) : 0x000000;
+  const level = talk ? 1 : listen ? (reduce.matches ? .8 : .45 + .55 * (Math.sin(t * 2.4) * .5 + .5)) : 0;
+  for (const l of leds) { l.material.emissive.setHex(color); l.material.emissiveIntensity = level * 3; }
+  const win = groups.shell.userData.win; win.material.emissive.setHex(color); win.material.emissiveIntensity = level * 1.4;
+  glow.material.color.setHex(color || 0xffffff); glow.material.opacity = level * .55;
+
+  model.updateMatrixWorld(true);
+  updateWires();
+
+  // labels fade in once the box is apart
+  const show = cur.e > .85;
+  labelDefs.forEach(([, fn], i) => {
+    const el = labels[i];
+    if (!show) { el.style.opacity = 0; return; }
+    tmp.copy(fn()).project(camera);
+    el.style.transform = `translate(${(tmp.x * .5 + .5) * innerWidth}px, ${(-tmp.y * .5 + .5) * innerHeight}px) translate(-50%, -50%)`;
+    el.style.opacity = 1;
+  });
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+frame();
+</script>
+</body>
+</html>

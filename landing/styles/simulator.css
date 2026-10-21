@@ -1,0 +1,220 @@
+/* WoKiToKi landing: "Pruébala" simulator. Tokens live in tokens.css. */
+
+#sim-mount {
+  --sim-amber: #F2A31B;
+  --sim-shell: #FBF7EC;
+  --sim-shell-edge: #E6DCC4;
+  --sim-dark: #1F2C26;
+  min-height: 0;
+  padding: clamp(24px, 4vw, 48px);
+  background: var(--cream-deep);
+  max-width: 920px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sim {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 56px);
+  align-items: center;
+}
+.sim__stage { display: grid; place-items: center; }
+
+/* ---------- The drawn box (no text on it) ---------- */
+.sim-box { width: min(100%, 340px); }
+
+.sim-box__shell {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  justify-items: center;
+  gap: clamp(22px, 5vw, 30px);
+  padding: 30px 26px 0;
+  border-radius: 40px;
+  background: var(--sim-shell);
+  box-shadow:
+    inset 0 -2px 0 var(--sim-shell-edge),
+    0 28px 44px -24px rgb(22 51 43 / 0.5),
+    0 6px 14px -6px rgb(22 51 43 / 0.25);
+}
+
+.sim-box__bezel {
+  display: grid;
+  place-items: center;
+  width: 92px; height: 92px;
+  border-radius: 50%;
+  background: var(--sim-dark);
+  box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.5), 0 1px 0 #fff;
+}
+
+.sim-light {
+  --lc: transparent;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: #2E3D36;
+  box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.45);
+  transition: background-color 0.18s var(--ease-out), box-shadow 0.18s var(--ease-out);
+}
+.sim-light:not([data-mode="off"]) {
+  background: var(--lc);
+  box-shadow:
+    inset 0 -4px 8px rgb(0 0 0 / 0.18),
+    inset 0 3px 6px rgb(255 255 255 / 0.35),
+    0 0 26px 6px color-mix(in srgb, var(--lc) 55%, transparent);
+}
+.sim-light[data-mode="pulse"] { animation: sim-pulse 0.7s ease-in-out infinite; }
+.sim-light[data-mode="breathe"] { animation: sim-breathe 3.4s ease-in-out infinite; }
+.sim-light[data-mode="flash"] { animation: sim-flash 0.8s var(--ease-out) 1 both; }
+
+@keyframes sim-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@keyframes sim-breathe {
+  0%, 100% { opacity: 0.4; filter: saturate(0.8); }
+  50% { opacity: 1; filter: saturate(1.1); }
+}
+@keyframes sim-flash {
+  0% { opacity: 1; transform: scale(1.18); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.sim-box__buttons {
+  display: flex;
+  justify-content: center;
+  gap: clamp(18px, 6vw, 30px);
+}
+.sim-box__socket {
+  display: grid;
+  place-items: center;
+  width: clamp(104px, 30vw, 118px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--sim-dark);
+  box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.5), 0 1px 0 #fff;
+}
+
+.sim-btn {
+  --b: var(--btn-red);
+  width: 86%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  background: radial-gradient(circle at 36% 30%, color-mix(in srgb, var(--b) 70%, #fff) 0 14%, var(--b) 55%, color-mix(in srgb, var(--b) 78%, #000) 100%);
+  box-shadow: 0 8px 0 color-mix(in srgb, var(--b) 62%, #000), 0 12px 14px -4px rgb(0 0 0 / 0.45);
+  transform: translateY(-4px);
+  transition: transform 0.08s var(--ease-out), box-shadow 0.08s var(--ease-out);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.sim-btn--green { --b: var(--btn-green); }
+.sim-btn:hover { filter: brightness(1.06); }
+.sim-btn:active, .sim-btn.is-pressed {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--b) 62%, #000), 0 4px 6px -2px rgb(0 0 0 / 0.45);
+}
+.sim-btn:focus-visible {
+  outline: 4px solid var(--green-forest);
+  outline-offset: 5px;
+  border-radius: 50%;
+}
+
+.sim-box__base {
+  justify-self: stretch;
+  height: 34px;
+  margin-inline: -26px;
+  background: var(--fam-yellow);
+  box-shadow: inset 0 3px 0 rgb(0 0 0 / 0.06);
+}
+
+/* ---------- Instructions, legend, controls (outside the box) ---------- */
+.sim__side { display: grid; gap: 26px; }
+
+.sim-steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--step-0);
+  line-height: 1.45;
+  max-width: 44ch;
+}
+.sim-steps strong { font-family: var(--font-display); font-weight: 600; }
+.sim-steps li:nth-child(1) strong { color: #B8281C; }
+.sim-steps li:nth-child(2) strong { color: #1F6E36; }
+
+.sim-legend__title {
+  margin-bottom: 10px;
+  font-size: var(--step-1);
+  letter-spacing: 0;
+}
+.sim-legend__list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.sim-legend__item {
+  display: grid;
+  grid-template-columns: 22px auto 1fr;
+  grid-template-areas: "dot name melody" ". colour melody";
+  align-items: center;
+  column-gap: 12px;
+  padding: 10px 16px;
+  border-radius: var(--radius-s);
+  background: var(--cream);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.sim-legend__dot {
+  grid-area: dot;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--lc);
+  box-shadow: inset 0 -2px 3px rgb(0 0 0 / 0.15);
+}
+.sim-legend__name { grid-area: name; font-family: var(--font-display); font-weight: 600; }
+.sim-legend__colour { grid-area: colour; font-size: var(--step--1); color: var(--ink-soft); }
+.sim-legend__melody {
+  grid-area: melody;
+  justify-self: end;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.sim__controls { display: flex; flex-wrap: wrap; gap: 12px; }
+.sim__controls .btn { min-width: 9.5rem; }
+.sim__controls .btn[aria-pressed="true"] { background: var(--ink); color: var(--cream); }
+
+.sim__note {
+  margin: 0;
+  max-width: 46ch;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 760px) {
+  .sim { grid-template-columns: minmax(0, 1fr); }
+  .sim__side { justify-items: start; }
+  .sim-legend, .sim-legend__list { width: 100%; }
+}
+
+/* ---------- Reduced motion: pulse and breathe become static colours ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sim-light[data-mode="pulse"],
+  .sim-light[data-mode="breathe"],
+  .sim-light[data-mode="flash"] { animation: none; opacity: 1; filter: none; transform: none; }
+  .sim-btn, .sim-light { transition: none; }
+}

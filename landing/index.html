@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WoKiToKi · Su propia voz, sin pantallas</title>
+  <meta name="description" content="WoKiToKi es una caja con dos botones y una luz para que niños de 3 a 7 años hablen con su familia, que responde desde el WhatsApp que ya tiene. Proyecto en prueba de concepto.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fonts load without blocking scripts: a slow or blocked Google Fonts request must never hold back the simulator or the figure module (module scripts wait for render-blocking stylesheets). -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fredoka:wght@500;600;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fredoka:wght@500;600;700&display=swap"></noscript>
+  <link rel="stylesheet" href="styles/tokens.css?v=20261021">
+  <link rel="stylesheet" href="styles/main.css?v=20261021">
+  <link rel="stylesheet" href="styles/simulator.css?v=20261021">
+  <link rel="stylesheet" href="styles/registro.css?v=20261021">
+</head>
+<body>
+  <svg class="icon-sprite" width="0" height="0" aria-hidden="true" focusable="false">
+    <symbol id="i-boton-rojo" viewBox="0 0 48 48"><path d="M9 30v-5c0-4 6-7 13-7s13 3 13 7v5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><ellipse cx="22" cy="30" rx="13" ry="7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><ellipse cx="22" cy="24" rx="9" ry="4.5" fill="#E5483B"/><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M37 10c2 2 2 5 0 7"/><path d="M41 6c4 4 4 11 0 15"/></g></symbol>
+    <symbol id="i-boton-verde" viewBox="0 0 48 48"><path d="M9 30v-5c0-4 6-7 13-7s13 3 13 7v5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><ellipse cx="22" cy="30" rx="13" ry="7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><ellipse cx="22" cy="24" rx="9" ry="4.5" fill="#3FAE5A"/><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M41 7c-3 2-3 6 0 8"/><path d="M36 5c-3 3-3 9 0 12"/></g></symbol>
+    <symbol id="i-escudo" viewBox="0 0 48 48"><path d="M24 5l15 5v12c0 10-7 17-15 21-8-4-15-11-15-21V10Z" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M17 24l5 5 9-10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-luz" viewBox="0 0 48 48"><circle cx="24" cy="24" r="8" fill="#F5C842"/><circle cx="24" cy="24" r="12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M24 4v4M24 40v4M4 24h4M40 24h4M10 10l3 3M35 35l3 3M38 10l-3 3M13 35l-3 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-melodia" viewBox="0 0 48 48"><path d="M18 34V12l20-5v22M18 18l20-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><ellipse cx="13" cy="34" rx="5" ry="4" fill="#F2799B" stroke="currentColor" stroke-width="2.4"/><ellipse cx="33" cy="29" rx="5" ry="4" fill="#5B9BD5" stroke="currentColor" stroke-width="2.4"/></symbol>
+    <symbol id="i-microfono" viewBox="0 0 48 48"><rect x="17" y="5" width="14" height="24" rx="7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11 23c0 8 6 13 13 13s13-5 13-13M24 36v7M18 43h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-nota-voz" viewBox="0 0 48 48"><path d="M8 12c0-3 2-5 5-5h22c3 0 5 2 5 5v16c0 3-2 5-5 5H20l-8 7v-7c-2 0-4-2-4-5Z" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M16 19v4M20 16v10M24 13v16M28 17v8M32 19v4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-sin-feed" viewBox="0 0 48 48"><rect x="7" y="10" width="34" height="24" rx="4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M17 41h14M8 7l32 32" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-sin-instalar" viewBox="0 0 48 48"><rect x="13" y="5" width="22" height="38" rx="5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M21 38h6M18 22l5 5 8-9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-sin-registro" viewBox="0 0 48 48"><rect x="9" y="6" width="30" height="36" rx="4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M16 16h16M16 24h10M16 32h6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M10 40L38 8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-solo-voz" viewBox="0 0 48 48"><path d="M6 24h2M12 18v12M18 12v24M24 16v16M30 8v32M36 15v18M42 22v4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-volumen" viewBox="0 0 48 48"><path d="M7 19h7l10-8v26l-10-8H7Z" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M31 19c2 3 2 7 0 10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M37 21v6M42 18v12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".4"/></symbol>
+  </svg>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <!-- 0 · Nav -->
+  <header class="nav">
+    <div class="container nav__inner">
+      <a class="wordmark" href="#inicio" aria-label="WoKiToKi, inicio">Wo<span class="wm-red">Ki</span>To<span class="wm-green">Ki</span></a>
+      <nav aria-label="Principal">
+        <ul class="nav__links">
+          <li><a href="#que-es">Qué es</a></li>
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#seguridad">Seguridad</a></li>
+          <li><a href="#preguntas">Preguntas</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--dark btn--small" href="#registro">Sé de las primeras familias</a>
+    </div>
+  </header>
+
+  <main id="contenido">
+
+    <!-- 1 · Hero -->
+    <section id="inicio" class="band band--cream hero" aria-labelledby="hero-title">
+      <img class="doodle d-hero-spiral" src="assets/doodles/spiral.svg" alt="" aria-hidden="true">
+      <img class="doodle d-hero-star" src="assets/doodles/star.svg" alt="" aria-hidden="true">
+      <div class="container hero__grid">
+        <div class="hero__copy">
+          <h1 id="hero-title" class="hero__title">Su propia <span class="hl hl--pink">voz</span>, sin pantallas.</h1>
+          <p class="hero__lede">Dos botones para hablar con toda la familia. Ellos responden desde el WhatsApp que ya tienen.</p>
+          <div class="hero__actions">
+            <a class="btn btn--dark" href="#registro">Sé de las primeras familias</a>
+            <a class="btn btn--ghost" href="#pruebala">Pruébala aquí</a>
+          </div>
+          <p class="hero__note">Proyecto en prueba de concepto. La caja está diseñada, aún no construida.</p>
+        </div>
+
+        <div class="hero__visual">
+          <div class="arch-back" aria-hidden="true"></div>
+          <img class="doodle d-hero-squiggle" src="assets/doodles/squiggle.svg" alt="" aria-hidden="true">
+          <figure class="ph ph--arch ph--yellow" style="--ratio: 4 / 5">
+            <img src="assets/images/hero-nino.png" loading="eager" fetchpriority="high" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Ilustración: un niño sonríe mientras aprieta el botón rojo de la caja WoKiToKi.">
+            <figcaption class="ph__label"><span>Ilustración en camino</span><code>hero-nino</code></figcaption>
+          </figure>
+          <span class="float-pill fp-1">Sin pantallas</span>
+          <span class="float-pill fp-2">Solo quien la familia autoriza</span>
+          <span class="float-pill fp-3">Nada que instalar</span>
+          <img class="doodle d-hero-arrow" src="assets/doodles/arrow.svg" alt="" aria-hidden="true">
+          <img class="doodle d-hero-waves" src="assets/doodles/waves.svg" alt="" aria-hidden="true">
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · Qué es (dark band) -->
+    <section id="que-es" class="band band--dark que-es" aria-labelledby="que-es-title">
+      <img class="doodle d-quees-heart" src="assets/doodles/heart.svg" alt="" aria-hidden="true">
+      <div class="container que-es__grid">
+        <div class="collage">
+          <figure class="ph ph--card ph--pink collage__a" style="--ratio: 1 / 1">
+            <img src="assets/images/que-es-caja.png" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Render conceptual de la caja: un botón rojo, un botón verde y una luz.">
+            <figcaption class="ph__label"><span>Render conceptual</span><code>que-es-caja</code></figcaption>
+          </figure>
+          <figure class="ph ph--card ph--blue collage__b" style="--ratio: 1 / 1">
+            <img src="assets/images/que-es-abuela.png" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Ilustración: una abuela sonríe mientras escucha una nota de voz en su celular.">
+            <figcaption class="ph__label"><span>Ilustración en camino</span><code>que-es-abuela</code></figcaption>
+          </figure>
+          <img class="doodle d-collage-star" src="assets/doodles/star.svg" alt="" aria-hidden="true">
+        </div>
+
+        <div class="que-es__copy">
+          <h2 id="que-es-title" class="h2">Dos botones. Toda la <span class="hl hl--yellow">familia</span>.</h2>
+          <p><strong>WoKiToKi</strong> es una caja con dos botones y una luz, pensada para niños de 3 a 7 años que todavía no leen.</p>
+          <p>El niño aprieta el <strong class="txt-accent-red">botón rojo</strong> y habla. Su voz le llega a la familia como una <strong>nota de voz en WhatsApp</strong>. Cuando la abuela responde, suena su melodía, la luz se enciende en su color y el niño aprieta el <strong class="txt-accent-green">botón verde</strong> para escucharla.</p>
+          <p class="que-es__tagline">Sin pantalla. Sin texto. Solo la voz de su familia.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · Cómo funciona (forest band, icon grid) -->
+    <section id="como-funciona" class="band band--forest como" aria-labelledby="como-title">
+      <img class="doodle d-como-squiggle" src="assets/doodles/squiggle.svg" alt="" aria-hidden="true">
+      <img class="doodle d-como-spiral" src="assets/doodles/spiral.svg" alt="" aria-hidden="true">
+      <div class="container">
+        <h2 id="como-title" class="h2 h2--center">Así de <span class="hl hl--yellow">simple</span> funciona</h2>
+        <ul class="icon-grid" role="list">
+          <li class="icon-item">
+            <svg class="icon" width="56" height="56" aria-hidden="true" focusable="false"><use href="#i-boton-rojo"/></svg>
+            <h3>Rojo para hablar</h3>
+            <p>Lo mantiene apretado mientras habla y lo suelta para enviar.</p>
+          </li>
+          <li class="icon-item">
+            <svg class="icon" width="56" height="56" aria-hidden="true" focusable="false"><use href="#i-boton-verde"/></svg>
+            <h3>Verde para escuchar</h3>
+            <p>Un toque y suena el siguiente mensaje de la familia.</p>
+          </li>
+          <li class="icon-item">
+            <svg class="icon" width="56" height="56" aria-hidden="true" focusable="false"><use href="#i-luz"/></svg>
+            <h3>La luz respira en el color de quien espera</h3>
+            <p>Así sabe que tiene un mensaje, y de quién es, sin leer nada.</p>
+          </li>
+          <li class="icon-item">
+            <svg class="icon" width="56" height="56" aria-hidden="true" focusable="false"><use href="#i-melodia"/></svg>
+            <h3>Cada familiar tiene su melodía</h3>
+            <p>Tres notas y un color propios: la abuela suena distinto que el tío.</p>
+          </li>
+          <li class="icon-item">
+            <svg class="icon" width="56" height="56" aria-hidden="true" focusable="false"><use href="#i-nota-voz"/></svg>
+            <h3>Llega como nota de voz a WhatsApp</h3>
+            <p>La familia escucha y responde igual que con cualquier audio.</p>
+          </li>
+          <li class="icon-item">
+            <svg class="icon" width="56" height="56" aria-hidden="true" focusable="false"><use href="#i-sin-instalar"/></svg>
+            <h3>Nada que instalar</h3>
+            <p>Los adultos usan el WhatsApp que ya tienen en su celular.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3b · Pruébala (simulator mount) -->
+    <section id="pruebala" class="band band--cream pruebala" aria-labelledby="pruebala-title">
+      <img class="doodle d-prueba-heart" src="assets/doodles/heart.svg" alt="" aria-hidden="true">
+      <img class="doodle d-prueba-waves" src="assets/doodles/waves.svg" alt="" aria-hidden="true">
+      <div class="container">
+        <h2 id="pruebala-title" class="h2 h2--center"><span class="hl hl--red">Pruébala</span> aquí mismo</h2>
+        <p class="section-intro">Mantén apretado el rojo para hablar y suelta para enviar. Aprieta el verde para escuchar lo que te dejó la familia. Los sonidos se activan con tu primer toque.</p>
+        <div id="sim-mount" class="mount mount--sim" role="region" aria-label="Simulador de la caja WoKiToKi"></div>
+      </div>
+    </section>
+
+    <!-- 4 · Cifras (dark band, stats row) -->
+    <section id="cifras" class="band band--dark cifras" aria-labelledby="cifras-title">
+      <img class="doodle d-cifras-star" src="assets/doodles/star.svg" alt="" aria-hidden="true">
+      <img class="doodle d-cifras-arrow" src="assets/doodles/arrow.svg" alt="" aria-hidden="true">
+      <div class="container">
+        <h2 id="cifras-title" class="h2 h2--center">Pocas piezas, pensadas para <span class="hl hl--yellow">sus manos</span></h2>
+        <ul class="stats" role="list">
+          <li class="stat"><strong class="stat__num c-pink">2</strong><span class="stat__label">botones</span></li>
+          <li class="stat"><strong class="stat__num c-yellow">0</strong><span class="stat__label">pantallas</span></li>
+          <li class="stat"><strong class="stat__num c-blue"><span class="stat__pre">hasta</span>8</strong><span class="stat__label">familiares</span></li>
+          <li class="stat"><strong class="stat__num c-green">3</strong><span class="stat__label">notas por melodía</span></li>
+        </ul>
+      </div>
+      <svg class="wave-edge" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 80V40c160-36 320-36 480 0s320 36 480 0 320-36 480 0v40Z" fill="#F6EFE0"/></svg>
+    </section>
+
+    <!-- 5 · Para toda la familia (image cards) -->
+    <section id="familia" class="band band--cream familia" aria-labelledby="familia-title">
+      <img class="doodle d-familia-spiral" src="assets/doodles/spiral.svg" alt="" aria-hidden="true">
+      <div class="container">
+        <h2 id="familia-title" class="h2 familia__title">Pensada para <span class="hl hl--pink">toda</span> la familia</h2>
+        <div class="cards">
+          <article class="card card--a">
+            <figure class="ph ph--card ph--orange" style="--ratio: 4 / 3">
+              <img src="assets/images/familia-nino.png" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Ilustración: un niño sentado en el piso, a punto de apretar el botón rojo.">
+              <figcaption class="ph__label"><span>Ilustración en camino</span><code>familia-nino</code></figcaption>
+              <span class="card__tag">Niños de 3 a 7 años</span>
+            </figure>
+            <h3 class="card__title">Habla <span class="ul ul--orange">solo</span>, sin ayuda.</h3>
+            <p>Rojo para hablar, verde para escuchar. No necesita leer ni pedirle el celular a nadie.</p>
+          </article>
+          <article class="card card--b">
+            <figure class="ph ph--card ph--blue" style="--ratio: 4 / 3">
+              <img src="assets/images/familia-papas.png" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Ilustración: un papá en la mesa de la cocina, junto a la caja, a punto de apretar el botón verde.">
+              <figcaption class="ph__label"><span>Ilustración en camino</span><code>familia-papas</code></figcaption>
+              <span class="card__tag">Mamá y papá</span>
+            </figure>
+            <h3 class="card__title">Se configura una vez, <span class="ul ul--blue">sin aplicaciones</span>.</h3>
+            <p>Sin aplicaciones nuevas ni cuentas para el niño. Ustedes deciden quién está en su familia.</p>
+          </article>
+          <article class="card card--c">
+            <figure class="ph ph--card ph--green" style="--ratio: 4 / 3">
+              <img src="assets/images/familia-abuelos.png" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Ilustración: dos abuelos en un sofá escuchan una nota de voz en el celular.">
+              <figcaption class="ph__label"><span>Ilustración en camino</span><code>familia-abuelos</code></figcaption>
+              <span class="card__tag">Abuelos y tíos</span>
+            </figure>
+            <h3 class="card__title">Responden desde <span class="ul ul--green">su WhatsApp</span>.</h3>
+            <p>Reciben la voz del niño como nota de voz y contestan igual, desde donde estén.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Mírala por dentro (figure mount) -->
+    <section id="por-dentro" class="band band--cream por-dentro" aria-labelledby="por-dentro-title">
+      <img class="doodle d-dentro-squiggle" src="assets/doodles/squiggle.svg" alt="" aria-hidden="true">
+      <div class="container">
+        <h2 id="por-dentro-title" class="h2 h2--center">Mírala por <span class="hl hl--blue">dentro</span></h2>
+        <p class="section-intro">Desarma la caja pieza por pieza y mira qué pasa cuando se aprieta cada botón.</p>
+        <div id="figure-mount" class="mount mount--figure" role="region" aria-label="Figura interactiva de la caja por dentro"></div>
+        <p class="caption">Render conceptual · la caja está diseñada, aún no construida</p>
+      </div>
+    </section>
+
+    <!-- 7 · Pensado para protegerlo (forest band, tiles) -->
+    <section id="seguridad" class="band band--forest seguridad" aria-labelledby="seguridad-title">
+      <img class="doodle d-seg-heart" src="assets/doodles/heart.svg" alt="" aria-hidden="true">
+      <div class="container">
+        <h2 id="seguridad-title" class="h2 h2--center">Pensado para <span class="hl hl--yellow">protegerlo</span></h2>
+        <p class="section-intro section-intro--dark">Te contamos cómo está diseñado y en qué estado está cada medida. WoKiToKi es una prueba de concepto, no un producto terminado.</p>
+        <p class="status-legend"><span class="status status--impl">Implementado</span> ya funciona en el prototipo <span class="status-legend__dot" aria-hidden="true">·</span> <span class="status status--disenado">Diseñado</span> falta construirlo en la caja <span class="status-legend__dot" aria-hidden="true">·</span> <span class="status status--principio">Principio</span> guía todo el producto</p>
+        <ul class="tiles" role="list">
+          <li class="tile tile--key tile--fill tile--pink">
+            <span class="tile__icon"><svg class="icon" width="28" height="28" aria-hidden="true" focusable="false"><use href="#i-escudo"/></svg></span>
+            <div class="tile__body">
+              <h3>Solo números que la familia autoriza</h3>
+              <p>Diseñado para aceptar solo esos números; así funciona ya en la conexión del prototipo. Los mensajes de cualquier otro se ignoran.</p>
+              <div class="tile__chips"><span class="status status--impl"><span class="sr-only">Estado: </span>Implementado en el prototipo</span></div>
+            </div>
+          </li>
+          <li class="tile tile--green">
+            <span class="tile__icon"><svg class="icon" width="28" height="28" aria-hidden="true" focusable="false"><use href="#i-sin-feed"/></svg></span>
+            <div class="tile__body">
+              <h3>Sin feed ni publicidad</h3>
+              <p>No hay pantalla, navegador ni búsquedas. Solo la voz de su familia.</p>
+              <div class="tile__chips"><span class="status status--principio"><span class="sr-only">Estado: </span>Principio</span></div>
+            </div>
+          </li>
+          <li class="tile tile--compact tile--soft tile--yellow tile--break3">
+            <span class="tile__icon"><svg class="icon" width="28" height="28" aria-hidden="true" focusable="false"><use href="#i-volumen"/></svg></span>
+            <div class="tile__body">
+              <h3>Volumen limitado</h3>
+              <p>Un tope de volumen para cuidar sus oídos.</p>
+              <div class="tile__chips"><span class="status status--disenado"><span class="sr-only">Estado: </span>Diseñado</span></div>
+            </div>
+          </li>
+          <li class="tile tile--key tile--fill tile--blue tile--break2">
+            <span class="tile__icon"><svg class="icon" width="28" height="28" aria-hidden="true" focusable="false"><use href="#i-microfono"/></svg></span>
+            <div class="tile__body">
+              <h3>Micrófono solo con el botón apretado</h3>
+              <p>No hay escucha pasiva ni palabra de activación. Al soltar, deja de grabar.</p>
+              <div class="tile__chips"><span class="status status--impl"><span class="sr-only">Estado: </span>Simulador: Implementado</span><span class="status status--disenado"><span class="sr-only">Estado: </span>Caja: Diseñado</span></div>
+            </div>
+          </li>
+          <li class="tile tile--soft tile--orange tile--break3">
+            <span class="tile__icon"><svg class="icon" width="28" height="28" aria-hidden="true" focusable="false"><use href="#i-solo-voz"/></svg></span>
+            <div class="tile__body">
+              <h3>Solo voz</h3>
+              <p>Textos, fotos y stickers que lleguen por WhatsApp se ignoran.</p>
+              <div class="tile__chips"><span class="status status--impl"><span class="sr-only">Estado: </span>Implementado</span></div>
+            </div>
+          </li>
+          <li class="tile tile--violet">
+            <span class="tile__icon"><svg class="icon" width="28" height="28" aria-hidden="true" focusable="false"><use href="#i-sin-registro"/></svg></span>
+            <div class="tile__body">
+              <h3>Su voz no se guarda en los registros</h3>
+              <p>La voz del niño nunca se escribe en los registros del sistema; solo datos como la duración del mensaje.</p>
+              <div class="tile__chips"><span class="status status--impl"><span class="sr-only">Estado: </span>Implementado</span></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8 · Preguntas frecuentes -->
+    <section id="preguntas" class="band band--cream preguntas" aria-labelledby="preguntas-title">
+      <img class="doodle d-faq-star" src="assets/doodles/star.svg" alt="" aria-hidden="true">
+      <img class="doodle d-faq-spiral" src="assets/doodles/spiral.svg" alt="" aria-hidden="true">
+      <div class="container container--narrow">
+        <h2 id="preguntas-title" class="h2 h2--center">Preguntas <span class="hl hl--green">frecuentes</span></h2>
+        <div class="faq">
+          <details>
+            <summary>¿Qué es WoKiToKi?</summary>
+            <p>Una caja con dos botones y una luz que permite a un niño de 3 a 7 años enviar y recibir mensajes de voz con su familia, que los recibe y responde desde WhatsApp.</p>
+          </details>
+          <details>
+            <summary>¿Tiene pantalla?</summary>
+            <p>No, y es deliberado. Toda la interacción es sonido, luz y tacto.</p>
+          </details>
+          <details>
+            <summary>¿La familia necesita instalar algo?</summary>
+            <p>No. Usa su WhatsApp normal: recibe notas de voz y responde con notas de voz.</p>
+          </details>
+          <details>
+            <summary>¿Cómo sabe el niño quién le habla si no lee?</summary>
+            <p>Cada familiar tiene una melodía de tres notas y un color propios, que suenan y se encienden antes de su voz.</p>
+          </details>
+          <details>
+            <summary>¿Puede un desconocido hablarle al niño?</summary>
+            <p>El sistema está diseñado para aceptar solo mensajes de números autorizados por la familia; los demás se ignoran.</p>
+          </details>
+          <details>
+            <summary>¿La caja escucha todo el tiempo?</summary>
+            <p>No. Está diseñada para grabar solo mientras el botón rojo está apretado. No hay escucha pasiva ni palabra de activación.</p>
+          </details>
+          <details>
+            <summary>¿Qué pasa si el niño suelta el botón antes de terminar?</summary>
+            <p>El mensaje se envía igual con lo que alcanzó a grabar. Solo un toque muy rápido no cuenta: suena un clic suave y no se envía nada, para que un roce sin querer no le llegue a la familia.</p>
+          </details>
+          <details>
+            <summary>¿Funciona fuera de casa?</summary>
+            <p>La caja está diseñada para funcionar con el WiFi de la casa.</p>
+          </details>
+          <details>
+            <summary>¿Ya se puede comprar?</summary>
+            <p>Todavía no. El proyecto está en fase de prueba de concepto; la caja física está diseñada pero no construida. Si te interesa, déjanos tus datos y te avisamos.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · Registro (dark closing band, form mount) -->
+    <section id="registro" class="band band--dark registro" aria-labelledby="registro-title">
+      <div class="container registro__layout">
+        <div class="registro__aside">
+          <img class="doodle d-reg-waves" src="assets/doodles/waves.svg" alt="" aria-hidden="true">
+          <h2 id="registro-title" class="h2 registro__title">Sé de las primeras <span class="hl hl--pink">familias</span></h2>
+          <p class="section-intro section-intro--dark registro__intro">Déjanos tus datos y te contamos cuando busquemos familias para el piloto. Sin&nbsp;compromiso.</p>
+          <ul class="registro__promesas">
+            <li><span class="registro__chip registro__chip--pink"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-nota-voz"/></svg></span>Te escribimos cuando haya novedades del piloto.</li>
+            <li><span class="registro__chip registro__chip--green"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-escudo"/></svg></span>Tú decides si participas en el piloto.</li>
+            <li><span class="registro__chip registro__chip--yellow"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-luz"/></svg></span>No hay nada que pagar: aún no está a la venta.</li>
+          </ul>
+          <img class="doodle d-reg-squiggle" src="assets/doodles/squiggle.svg" alt="" aria-hidden="true">
+        </div>
+        <div class="registro__card">
+        <img class="doodle d-reg-star" src="assets/doodles/star.svg" alt="" aria-hidden="true">
+        <form id="registro-form" class="registro-form" novalidate aria-labelledby="registro-title">
+          <div class="field field--full">
+            <label for="f-nombre">Tu nombre</label>
+            <input id="f-nombre" name="nombre" type="text" autocomplete="name" aria-describedby="err-nombre">
+            <p class="field__error" id="err-nombre" hidden></p>
+          </div>
+
+          <fieldset class="form__group field--full">
+            <legend class="form__legend">¿Dónde te avisamos?</legend>
+            <p class="form__group-hint" id="hint-contacto">Con uno de los dos nos basta. Puedes dejar los dos.</p>
+            <p class="field__error" id="err-contacto" hidden></p>
+            <div class="form__pair">
+              <div class="field">
+                <label for="f-email">Correo</label>
+                <input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" aria-describedby="hint-contacto err-contacto err-email">
+                <p class="field__error" id="err-email" hidden></p>
+              </div>
+              <div class="field">
+                <label for="f-whatsapp">WhatsApp</label>
+                <input id="f-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="+57 300 123 4567" aria-describedby="hint-contacto err-contacto err-whatsapp">
+                <p class="field__error" id="err-whatsapp" hidden></p>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="f-edad">Edad del niño o la niña</label>
+            <select id="f-edad" name="edad" aria-describedby="err-edad">
+              <option value="">Elige una edad</option>
+              <option value="3">3 años</option>
+              <option value="4">4 años</option>
+              <option value="5">5 años</option>
+              <option value="6">6 años</option>
+              <option value="7">7 años</option>
+            </select>
+            <p class="field__error" id="err-edad" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-ciudad">Ciudad <span class="opt">(opcional)</span></label>
+            <input id="f-ciudad" name="ciudad" type="text" autocomplete="address-level2">
+          </div>
+
+          <div class="check field--full">
+            <input id="f-piloto" name="piloto" type="checkbox">
+            <label for="f-piloto">Me gustaría participar en el piloto con mi familia.</label>
+          </div>
+
+          <!-- TODO(privacy): add consent checkbox + privacy policy (Ley 1581) before going live -->
+
+          <div class="form__submit field--full">
+            <button class="btn btn--dark registro__submit" type="submit">Sé de las primeras familias</button>
+            <p class="form__note">Te avisamos cuando esté disponible. Aún no se puede comprar.</p>
+          </div>
+        </form>
+        <div id="registro-status" class="registro__status" role="status" aria-live="polite" tabindex="-1"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 10 · Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="wordmark wordmark--big" aria-hidden="true">Wo<span class="wm-red">Ki</span>To<span class="wm-green">Ki</span></p>
+      <p class="footer__line">WoKiToKi · nombre provisional · Un desarrollo de Simian · Prueba de concepto · Sin afiliación con WhatsApp ni Meta</p>
+    </div>
+  </footer>
+
+  <script type="module" src="js/sim-view.js"></script>
+  <script type="module" src="js/registro-view.js"></script>
+  <!-- Anatomy figure (built by figures/wokitoki-box/build.mjs --landing, copied into vendor/): mounts into #figure-mount -->
+  <script type="module" src="vendor/wokitoki-figure/wokitoki-figure.js"></script>
+</body>
+</html>

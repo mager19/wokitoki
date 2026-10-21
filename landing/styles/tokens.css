@@ -1,0 +1,54 @@
+/* WoKiToKi landing: design tokens.
+   Base palette from the Scribo reference (cream, dark green, forest green);
+   accents are the six family colours plus the product's talk/listen buttons. */
+:root {
+  /* Base */
+  --cream: #F6EFE0;
+  --cream-deep: #EFE3C8;
+  --green-dark: #16332B;
+  --green-forest: #1E5A3E;
+  --ink: #1B2E25;
+  --ink-soft: #44564C;
+  --on-dark: #F6EFE0;
+  --on-dark-soft: #CBDCCF;
+
+  /* Family colours */
+  --fam-pink: #F2799B;
+  --fam-blue: #5B9BD5;
+  --fam-green: #6BBF59;
+  --fam-orange: #F29B38;
+  --fam-violet: #8E6BC9;
+  --fam-yellow: #F5C842;
+
+  /* Product buttons */
+  --btn-red: #E5483B;
+  --btn-green: #3FAE5A;
+  --btn-red-deep: #C8372B; /* red for text-bearing surfaces: cream on it is 4.55:1 */
+
+  /* Type */
+  --font-display: "Fredoka", "Nunito", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: clamp(1.4rem, 1.1rem + 1vw, 1.75rem);
+  --step-3: clamp(2rem, 1.3rem + 2.6vw, 3.25rem);
+  --step-4: clamp(2.6rem, 1.4rem + 5vw, 5.25rem);
+  --step-stat: clamp(3rem, 2rem + 4vw, 5rem);
+
+  /* Space */
+  --gutter: clamp(16px, 4vw, 48px);
+  --section-y: clamp(72px, 9vw, 128px);
+  --container: 1180px;
+
+  /* Shape and depth */
+  --radius-s: 12px;
+  --radius-m: 22px;
+  --radius-l: 36px;
+  --pill: 999px;
+  --shadow-soft: 0 10px 24px -12px rgb(22 51 43 / 0.35), 0 2px 6px -2px rgb(22 51 43 / 0.18);
+  --shadow-lift: 0 18px 36px -16px rgb(22 51 43 / 0.45), 0 4px 10px -4px rgb(22 51 43 / 0.2);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
