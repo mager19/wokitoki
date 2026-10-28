@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="styles/tokens.css?v=20261021b">
   <link rel="stylesheet" href="styles/main.css?v=20261028b">
   <link rel="stylesheet" href="styles/simulator.css?v=20261021b">
-  <link rel="stylesheet" href="styles/registro.css?v=20261028a">
+  <link rel="stylesheet" href="styles/registro.css?v=20261028b">
 </head>
 <body>
   <svg class="icon-sprite" width="0" height="0" aria-hidden="true" focusable="false">
@@ -385,7 +385,7 @@
         <form id="registro-form" class="registro-form" novalidate aria-labelledby="registro-title">
           <div class="field field--full">
             <label for="f-nombre">Tu nombre</label>
-            <input id="f-nombre" name="nombre" type="text" autocomplete="name" aria-describedby="err-nombre">
+            <input id="f-nombre" name="nombre" type="text" maxlength="120" autocomplete="name" aria-describedby="err-nombre">
             <p class="field__error" id="err-nombre" hidden></p>
           </div>
 
@@ -396,12 +396,12 @@
             <div class="form__pair">
               <div class="field">
                 <label for="f-email">Correo</label>
-                <input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" aria-describedby="hint-contacto err-contacto err-email">
+                <input id="f-email" name="email" type="email" maxlength="254" inputmode="email" autocomplete="email" aria-describedby="hint-contacto err-contacto err-email">
                 <p class="field__error" id="err-email" hidden></p>
               </div>
               <div class="field">
                 <label for="f-whatsapp">WhatsApp</label>
-                <input id="f-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="+57 300 123 4567" aria-describedby="hint-contacto err-contacto err-whatsapp">
+                <input id="f-whatsapp" name="whatsapp" type="tel" maxlength="30" inputmode="tel" autocomplete="tel" placeholder="+57 300 123 4567" aria-describedby="hint-contacto err-contacto err-whatsapp">
                 <p class="field__error" id="err-whatsapp" hidden></p>
               </div>
             </div>
@@ -424,7 +424,8 @@
           </div>
           <div class="field">
             <label for="f-ciudad">Ciudad <span class="opt">(opcional)</span></label>
-            <input id="f-ciudad" name="ciudad" type="text" autocomplete="address-level2">
+            <input id="f-ciudad" name="ciudad" type="text" maxlength="120" autocomplete="address-level2" aria-describedby="err-ciudad">
+            <p class="field__error" id="err-ciudad" hidden></p>
           </div>
 
           <div class="check field--full">
@@ -438,10 +439,9 @@
             <input id="f-sitio" name="sitio" type="text" tabindex="-1" autocomplete="off">
           </div>
 
-          <!-- TODO(privacy): add consent checkbox + privacy policy (Ley 1581) before going live -->
-
           <div class="form__submit field--full">
-            <button class="btn btn--dark registro__submit" type="submit">Sé de las primeras familias</button>
+            <p class="form__consent" id="consent-note">Al enviar este formulario aceptas nuestra <a href="privacidad.html">Política de tratamiento de datos personales</a>.</p>
+            <button class="btn btn--dark registro__submit" type="submit" aria-describedby="consent-note">Sé de las primeras familias</button>
             <p class="form__note">Te avisamos cuando esté disponible. Aún no se puede comprar.</p>
           </div>
         </form>
@@ -456,11 +456,12 @@
     <div class="container footer__inner">
       <p class="wordmark wordmark--big" aria-hidden="true">Wo<span class="wm-red">Ki</span>To<span class="wm-green">Ki</span></p>
       <p class="footer__line">WoKiToKi · nombre provisional · Un desarrollo de Simian · Prueba de concepto · Sin afiliación con WhatsApp ni Meta</p>
+      <p class="footer__line"><a href="privacidad.html">Política de tratamiento de datos personales</a></p>
     </div>
   </footer>
 
   <script type="module" src="js/sim-view.js"></script>
-  <script type="module" src="js/registro-view.js?v=20261028b"></script>
+  <script type="module" src="js/registro-view.js?v=20261028c"></script>
   <script type="module" src="js/tabs.js"></script>
   <!-- Anatomy figure (built by figures/wokitoki-box/build.mjs --landing, copied into vendor/): mounts into #figure-mount -->
   <script type="module" src="vendor/wokitoki-figure/wokitoki-figure.js"></script>

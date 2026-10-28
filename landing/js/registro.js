@@ -6,6 +6,9 @@ import { SUPABASE_URL, SUPABASE_KEY } from './supabase-config.js?v=20261028b';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // Who the box is for: a child's age (3 to 7) or an older adult.
 const PARA = new Set(['3', '4', '5', '6', '7', 'mayor']);
+// Mirrors the column checks in supabase/leads.sql, so the database never rejects valid-looking input.
+const MAX = { nombre: 120, ciudad: 120, email: 254, whatsapp: 30 };
+const TOO_LONG = `Máximo ${MAX.nombre} caracteres.`;
 
 const str = (v) => (typeof v === 'string' ? v.trim() : v == null ? '' : String(v).trim());
 
@@ -16,15 +19,19 @@ export function validateRegistration(data = {}) {
   const whatsapp = str(data.whatsapp);
   const para = str(data.para);
 
+  const ciudad = str(data.ciudad);
+
   if (!nombre) errors.nombre = 'Escribe tu nombre.';
+  else if (nombre.length > MAX.nombre) errors.nombre = TOO_LONG;
+  if (ciudad.length > MAX.ciudad) errors.ciudad = TOO_LONG;
 
   if (!email && !whatsapp) {
     errors.contacto = 'Déjanos un correo o un WhatsApp.';
   } else {
-    if (email && !EMAIL_RE.test(email)) errors.email = 'Revisa el correo.';
+    if (email && (email.length > MAX.email || !EMAIL_RE.test(email))) errors.email = 'Revisa el correo.';
     if (whatsapp) {
       const digits = whatsapp.replace(/\D/g, '');
-      if (digits.length < 7 || digits.length > 15) errors.whatsapp = 'Revisa el número.';
+      if (digits.length < 7 || digits.length > 15 || whatsapp.length > MAX.whatsapp) errors.whatsapp = 'Revisa el número.';
     }
   }
 
@@ -38,7 +45,7 @@ const orNull = (v) => str(v) || null;
 // Inserts the lead into the Supabase `leads` table (see supabase/leads.sql).
 // `options` exists so tests can swap the endpoint and fetch.
 export async function submitRegistration(data, options = {}) {
-  const { url = SUPABASE_URL, key = SUPABASE_KEY, fetch = globalThis.fetch } = options;
+  const { url = SUPABASE_URL, key = SUPABASE_KEY, fetch = globalThis.fetch, timeoutMs = 15000 } = options;
 
   // Honeypot: people never see the "sitio" field, bots fill it. Pretend success.
   if (str(data.sitio)) return { ok: true };
@@ -59,6 +66,8 @@ export async function submitRegistration(data, options = {}) {
       method: 'POST',
       headers: { apikey: key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify(lead),
+      // A stalled request must still end in the failure message, not an endless wait.
+      signal: AbortSignal.timeout(timeoutMs),
     });
     return { ok: res.ok };
   } catch {

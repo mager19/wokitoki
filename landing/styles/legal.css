@@ -1,0 +1,26 @@
+/* WoKiToKi landing: privacy policy page (privacidad.html). */
+.legal {
+  padding-block: clamp(40px, 6vw, 80px) var(--section-y);
+  background: var(--cream);
+  color: var(--ink);
+}
+.legal__title {
+  margin: 0 0 0.4em;
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  line-height: 1.1;
+}
+.legal__meta { margin: 0 0 2rem; color: var(--ink-soft); font-size: var(--step--1); }
+.legal h2 {
+  margin: 2.25rem 0 0.6rem;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1.2;
+}
+.legal p,
+.legal li { max-width: 68ch; line-height: 1.65; }
+.legal ul { padding-left: 1.25rem; list-style: disc; }
+.legal li::marker { color: var(--green-forest); }
+.legal li + li { margin-top: 0.35rem; }
+.legal a { color: var(--green-forest); font-weight: 600; text-underline-offset: 3px; }
+.legal__back { margin-top: 3rem; }

@@ -229,6 +229,8 @@
 .registro__submit:focus-visible { outline: 3px solid var(--green-forest); outline-offset: 3px; }
 .registro__submit:disabled { opacity: 0.6; cursor: progress; transform: none; }
 .form__note { margin: 0; font-size: var(--step--1); color: var(--ink-soft); }
+.form__consent { margin: 0 0 0.25rem; font-size: var(--step--1); color: var(--ink-soft); }
+.form__consent a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
 
 /* Success / failure message (lives inside the card) */
 .registro__status {
@@ -267,7 +269,7 @@
   .form__group { padding: 16px 14px 18px; }
   .form__submit { justify-items: stretch; }
   .registro__submit { width: 100%; font-size: 1.0625rem; padding-inline: 1em; }
-  .form__note { text-align: center; }
+  .form__note, .form__consent { text-align: center; }
   .registro .d-reg-waves { width: 40px; top: -50px; left: calc(50% - 20px); }
   .registro .d-reg-star { width: 50px; top: -24px; right: -8px; }
   .registro__promesas li { font-size: 1rem; }
