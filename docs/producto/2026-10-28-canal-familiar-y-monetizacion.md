@@ -1,7 +1,7 @@
 # WoKiToKi — Canal familiar y monetización
 
 Fecha: 2026-10-28
-Estado: canal decidido; monetización abierta
+Estado: canal y monetización decididos
 
 ## 1. Contexto
 
@@ -54,9 +54,26 @@ Una primera versión (MVP) con una sola persona toma unas 6 a 10 semanas, con un
 
 En el servidor, el canal de mensajería queda detrás de una interfaz, para que la caja no sepa por dónde llegan sus mensajes a la familia. Si un mercado o un aliado lo exige, más adelante se puede agregar un adaptador de WhatsApp sin reescribir el núcleo.
 
-## 3. Monetización (abierta)
+## 3. Monetización (decidida)
 
-### 3.1 Propuesta en discusión
+### 3.0 Modelo decidido
+
+- **Caja: 350.000 COP**, pago único, con el **primer mes de servicio incluido**.
+- **Plan familiar: 30.000 COP al mes** desde el segundo mes, cobro automático, **sin permanencia**.
+- **Sin suscripción activa, la caja no envía ni recibe mensajes.**
+- El plan incluye:
+  - audios ilimitados,
+  - cada audio queda guardado **30 días** y después se borra,
+  - **hasta 8 familiares** en la app,
+  - un color y una melodía para cada familiar.
+- Un solo plan cubre a toda la familia: no se cobra por persona.
+- **IVA y envío sin definir.** Los precios son de referencia: todavía no hay prototipo y no se vende.
+
+Se publica como demostración para una feria de emprendimientos en la página `/pricing/` de la landing (ver `docs/superpowers/specs/2026-10-28-app-propia-y-pricing-design.md`).
+
+Las secciones 3.1 a 3.3 quedan como historia de la decisión.
+
+### 3.1 Propuesta inicial
 
 Vender un pack inicial con la caja y **3 usuarios**, y cobrar una **mensualidad por cada usuario extra**.
 
@@ -66,7 +83,7 @@ Vender un pack inicial con la caja y **3 usuarios**, y cobrar una **mensualidad 
 - **No refleja los costos.** Sin Meta, un usuario extra cuesta casi nada. Los costos reales son el hardware, los servidores y el mantenimiento de la app.
 - **Ingreso recurrente débil.** Si solo pagan mensualidad las familias con más de tres usuarios, la mayoría no paga nada después de la compra. Servidores, soporte y actualizaciones de la app quedan sin financiar.
 
-### 3.3 Alternativa recomendada
+### 3.3 Alternativa recomendada (base del modelo decidido; se eligió un mes incluido en lugar de 3 a 6)
 
 - **Pack inicial**: la caja más **3 a 6 meses de servicio** incluidos.
 - **Después, una suscripción familiar plana y baja**, con **muchos familiares incluidos** (por ejemplo, hasta 8).
@@ -88,8 +105,13 @@ Antes de fijar precios, modelar el costo por familia al mes (amortización del h
 
 ## 4. Impacto en los materiales actuales
 
-La landing es una demostración simple y puede cambiar en cualquier momento. Cuando la app sea el canal, habrá que actualizar:
-- la respuesta de la pregunta frecuente «¿La familia necesita instalar algo?»,
-- todos los mensajes de «responde desde su WhatsApp», en la portada, las tarjetas de familia y «Cómo funciona»,
+La landing es una demostración simple y puede cambiar en cualquier momento.
+
+**Hecho el 2026-10-28** en la landing:
+- se quitó WhatsApp como canal; los textos hablan de la app de WoKiToKi,
+- se cambió la respuesta de «¿La familia necesita instalar algo?»,
+- se agregó la página `/pricing/`, enlazada desde el pie de página.
+
+**Pendiente:**
 - la política de privacidad (encargados del tratamiento, datos de la app),
 - el folleto y el video demo, que muestran WhatsApp.
