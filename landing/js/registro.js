@@ -1,5 +1,7 @@
-// Pure validation and the single future-endpoint hook for the registration form.
+// Pure validation and the Supabase submit for the registration form.
 // No DOM access here, so it runs under node --test.
+
+import { SUPABASE_URL, SUPABASE_KEY } from './supabase-config.js?v=20261028b';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // Who the box is for: a child's age (3 to 7) or an older adult.
@@ -31,9 +33,35 @@ export function validateRegistration(data = {}) {
   return { ok: Object.keys(errors).length === 0, errors };
 }
 
-export function submitRegistration(data) {
-  // TODO(endpoint): send `data` to the registration backend once it exists.
-  // Today nothing leaves the browser: the promise just resolves.
-  void data;
-  return Promise.resolve({ ok: true });
+const orNull = (v) => str(v) || null;
+
+// Inserts the lead into the Supabase `leads` table (see supabase/leads.sql).
+// `options` exists so tests can swap the endpoint and fetch.
+export async function submitRegistration(data, options = {}) {
+  const { url = SUPABASE_URL, key = SUPABASE_KEY, fetch = globalThis.fetch } = options;
+
+  // Honeypot: people never see the "sitio" field, bots fill it. Pretend success.
+  if (str(data.sitio)) return { ok: true };
+  // Not configured (e.g. a local copy without keys): behave like before, send nothing.
+  if (!url || !key) return { ok: true };
+
+  const lead = {
+    nombre: str(data.nombre),
+    email: orNull(data.email),
+    whatsapp: orNull(data.whatsapp),
+    para: str(data.para),
+    ciudad: orNull(data.ciudad),
+    piloto: Boolean(data.piloto),
+  };
+
+  try {
+    const res = await fetch(`${url}/rest/v1/leads`, {
+      method: 'POST',
+      headers: { apikey: key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify(lead),
+    });
+    return { ok: res.ok };
+  } catch {
+    return { ok: false };
+  }
 }

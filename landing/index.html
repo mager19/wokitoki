@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="styles/tokens.css?v=20261021b">
   <link rel="stylesheet" href="styles/main.css?v=20261028b">
   <link rel="stylesheet" href="styles/simulator.css?v=20261021b">
-  <link rel="stylesheet" href="styles/registro.css?v=20261021b">
+  <link rel="stylesheet" href="styles/registro.css?v=20261028a">
 </head>
 <body>
   <svg class="icon-sprite" width="0" height="0" aria-hidden="true" focusable="false">
@@ -432,6 +432,12 @@
             <label for="f-piloto">Me gustaría participar en el piloto con mi familia.</label>
           </div>
 
+          <!-- Honeypot: hidden from people and screen readers; bots that fill it are dropped silently. -->
+          <div class="hp" aria-hidden="true">
+            <label for="f-sitio">Sitio web</label>
+            <input id="f-sitio" name="sitio" type="text" tabindex="-1" autocomplete="off">
+          </div>
+
           <!-- TODO(privacy): add consent checkbox + privacy policy (Ley 1581) before going live -->
 
           <div class="form__submit field--full">
@@ -454,7 +460,7 @@
   </footer>
 
   <script type="module" src="js/sim-view.js"></script>
-  <script type="module" src="js/registro-view.js?v=20261028a"></script>
+  <script type="module" src="js/registro-view.js?v=20261028b"></script>
   <script type="module" src="js/tabs.js"></script>
   <!-- Anatomy figure (built by figures/wokitoki-box/build.mjs --landing, copied into vendor/): mounts into #figure-mount -->
   <script type="module" src="vendor/wokitoki-figure/wokitoki-figure.js"></script>

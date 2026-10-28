@@ -60,12 +60,61 @@ test('valid data passes', () => {
   assert.deepEqual(r.errors, {});
 });
 
-test('submitRegistration resolves ok without network', async () => {
-  const saved = globalThis.fetch;
-  globalThis.fetch = () => { throw new Error('network used'); };
-  try {
-    assert.deepEqual(await submitRegistration(make()), { ok: true });
-  } finally {
-    globalThis.fetch = saved;
-  }
+const config = { url: 'https://example.supabase.co', key: 'sb_publishable_test' };
+
+function fakeFetch(response = { ok: true, status: 201 }) {
+  const calls = [];
+  const fn = async (url, init) => { calls.push({ url, init }); return response; };
+  fn.calls = calls;
+  return fn;
+}
+
+test('submitRegistration posts the lead to the Supabase leads table', async () => {
+  const fetch = fakeFetch();
+  const res = await submitRegistration(make({ whatsapp: ' +57 300 123 4567 ', piloto: true }), { ...config, fetch });
+  assert.deepEqual(res, { ok: true });
+  assert.equal(fetch.calls.length, 1);
+  const { url, init } = fetch.calls[0];
+  assert.equal(url, 'https://example.supabase.co/rest/v1/leads');
+  assert.equal(init.method, 'POST');
+  assert.equal(init.headers.apikey, 'sb_publishable_test');
+  assert.equal(init.headers.Prefer, 'return=minimal');
+  assert.deepEqual(JSON.parse(init.body), {
+    nombre: 'Ana Pérez',
+    email: 'ana@example.com',
+    whatsapp: '+57 300 123 4567',
+    para: '5',
+    ciudad: 'Bogotá',
+    piloto: true,
+  });
+});
+
+test('submitRegistration sends empty optional fields as null', async () => {
+  const fetch = fakeFetch();
+  await submitRegistration(make({ whatsapp: '', ciudad: '  ' }), { ...config, fetch });
+  const body = JSON.parse(fetch.calls[0].init.body);
+  assert.equal(body.whatsapp, null);
+  assert.equal(body.ciudad, null);
+});
+
+test('submitRegistration reports a failed request', async () => {
+  const fetch = fakeFetch({ ok: false, status: 400 });
+  assert.deepEqual(await submitRegistration(make(), { ...config, fetch }), { ok: false });
+});
+
+test('submitRegistration reports a network error', async () => {
+  const fetch = async () => { throw new Error('offline'); };
+  assert.deepEqual(await submitRegistration(make(), { ...config, fetch }), { ok: false });
+});
+
+test('submitRegistration drops honeypot submissions without network', async () => {
+  const fetch = fakeFetch();
+  assert.deepEqual(await submitRegistration(make({ sitio: 'spam.example' }), { ...config, fetch }), { ok: true });
+  assert.equal(fetch.calls.length, 0);
+});
+
+test('submitRegistration skips the network when Supabase is not configured', async () => {
+  const fetch = fakeFetch();
+  assert.deepEqual(await submitRegistration(make(), { url: '', key: '', fetch }), { ok: true });
+  assert.equal(fetch.calls.length, 0);
 });

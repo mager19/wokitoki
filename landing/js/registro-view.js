@@ -1,6 +1,6 @@
 // DOM view for the registration form. Validation lives in registro.js.
 
-import { validateRegistration, submitRegistration } from './registro.js?v=20261028a';
+import { validateRegistration, submitRegistration } from './registro.js?v=20261028b';
 
 const form = document.getElementById('registro-form');
 const status = document.getElementById('registro-status');
@@ -23,6 +23,7 @@ function readData() {
     para: v('f-para').value,
     ciudad: v('f-ciudad').value,
     piloto: v('f-piloto').checked,
+    sitio: v('f-sitio').value,
   };
 }
 

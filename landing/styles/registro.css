@@ -272,3 +272,12 @@
   .registro .d-reg-star { width: 50px; top: -24px; right: -8px; }
   .registro__promesas li { font-size: 1rem; }
 }
+
+/* Honeypot field: off-screen rather than display:none, so naive bots still fill it. */
+.hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
