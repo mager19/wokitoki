@@ -64,3 +64,11 @@ test('every local href/src on the pricing page resolves to a file', () => {
     assert.ok(existsSync(fileURLToPath(url)), `broken link: ${ref}`);
   }
 });
+
+test('landing footer links to the pricing page with a trailing slash', () => {
+  const html = read('index.html');
+  const footer = html.match(/<footer[\s\S]*?<\/footer>/)[0];
+  const nav = html.match(/<header class="nav">[\s\S]*?<\/header>/)[0];
+  assert.match(footer, /href="pricing\/"/);
+  assert.doesNotMatch(nav, /pricing/);
+});

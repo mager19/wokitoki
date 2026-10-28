@@ -712,6 +712,20 @@ input, textarea { caret-color: var(--btn-red); }
 .footer__inner { display: grid; justify-items: center; gap: 14px; text-align: center; }
 .wordmark.wordmark--big { font-size: clamp(2.5rem, 2rem + 3vw, 4rem); margin: 0; }
 .footer__line { margin: 0; color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
+/* Discreet entry to the pricing demo page: findable by the presenter, never competing with the main CTA. */
+.footer__pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 0.9em;
+  border: 1.5px solid var(--green-forest);
+  border-radius: var(--pill);
+  color: var(--ink-soft);
+  font-size: var(--step--1);
+  text-decoration: none;
+}
+.footer__pill:hover,
+.footer__pill:focus-visible { background: var(--green-forest); color: var(--cream); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 960px) {
