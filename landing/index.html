@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>WoKiToKi · Su propia voz, sin pantallas</title>
-  <meta name="description" content="WoKiToKi es una caja con dos botones y una luz para que niños de 3 a 7 años hablen con su familia, que responde desde el WhatsApp que ya tiene. Proyecto en prueba de concepto.">
+  <meta name="description" content="WoKiToKi es una caja con dos botones y una luz para que niños de 3 a 7 años hablen con su familia, que responde desde el WhatsApp que ya tiene. También sirve para adultos mayores. Proyecto en prueba de concepto.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Fonts load without blocking scripts: a slow or blocked Google Fonts request must never hold back the simulator or the figure module (module scripts wait for render-blocking stylesheets). -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fredoka:wght@500;600;700&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fredoka:wght@500;600;700&display=swap"></noscript>
   <link rel="stylesheet" href="styles/tokens.css?v=20261021b">
-  <link rel="stylesheet" href="styles/main.css?v=20261028a">
+  <link rel="stylesheet" href="styles/main.css?v=20261028b">
   <link rel="stylesheet" href="styles/simulator.css?v=20261021b">
   <link rel="stylesheet" href="styles/registro.css?v=20261021b">
 </head>
@@ -408,16 +408,19 @@
           </fieldset>
 
           <div class="field">
-            <label for="f-edad">Edad del niño o la niña</label>
-            <select id="f-edad" name="edad" aria-describedby="err-edad">
-              <option value="">Elige una edad</option>
-              <option value="3">3 años</option>
-              <option value="4">4 años</option>
-              <option value="5">5 años</option>
-              <option value="6">6 años</option>
-              <option value="7">7 años</option>
+            <label for="f-para">¿Para quién sería?</label>
+            <select id="f-para" name="para" aria-describedby="err-para">
+              <option value="">Elige una opción</option>
+              <optgroup label="Un niño o niña">
+                <option value="3">3 años</option>
+                <option value="4">4 años</option>
+                <option value="5">5 años</option>
+                <option value="6">6 años</option>
+                <option value="7">7 años</option>
+              </optgroup>
+              <option value="mayor">Un adulto mayor</option>
             </select>
-            <p class="field__error" id="err-edad" hidden></p>
+            <p class="field__error" id="err-para" hidden></p>
           </div>
           <div class="field">
             <label for="f-ciudad">Ciudad <span class="opt">(opcional)</span></label>
@@ -451,7 +454,7 @@
   </footer>
 
   <script type="module" src="js/sim-view.js"></script>
-  <script type="module" src="js/registro-view.js"></script>
+  <script type="module" src="js/registro-view.js?v=20261028a"></script>
   <script type="module" src="js/tabs.js"></script>
   <!-- Anatomy figure (built by figures/wokitoki-box/build.mjs --landing, copied into vendor/): mounts into #figure-mount -->
   <script type="module" src="vendor/wokitoki-figure/wokitoki-figure.js"></script>

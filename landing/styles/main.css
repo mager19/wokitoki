@@ -482,7 +482,7 @@ input, textarea { caret-color: var(--btn-red); }
   background: var(--green-dark);
   color: var(--on-dark);
 }
-.tabs + .cards { margin-top: 2rem; }
+.tabs ~ .cards { margin-top: 2rem; }
 .card--b { margin-top: 72px; }
 .card--c { margin-top: 24px; }
 .card .ph { margin-bottom: 1.25rem; }

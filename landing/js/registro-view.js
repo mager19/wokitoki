@@ -1,6 +1,6 @@
 // DOM view for the registration form. Validation lives in registro.js.
 
-import { validateRegistration, submitRegistration } from './registro.js';
+import { validateRegistration, submitRegistration } from './registro.js?v=20261028a';
 
 const form = document.getElementById('registro-form');
 const status = document.getElementById('registro-status');
@@ -11,7 +11,7 @@ const FIELDS = [
   { key: 'contacto', input: 'f-email' },
   { key: 'email', input: 'f-email' },
   { key: 'whatsapp', input: 'f-whatsapp' },
-  { key: 'edad', input: 'f-edad' },
+  { key: 'para', input: 'f-para' },
 ];
 
 function readData() {
@@ -20,7 +20,7 @@ function readData() {
     nombre: v('f-nombre').value,
     email: v('f-email').value,
     whatsapp: v('f-whatsapp').value,
-    edad: v('f-edad').value,
+    para: v('f-para').value,
     ciudad: v('f-ciudad').value,
     piloto: v('f-piloto').checked,
   };
@@ -34,7 +34,7 @@ function showErrors(errors) {
     box.hidden = !msg;
   }
   // The shared "contacto" error marks both contact inputs.
-  for (const key of ['nombre', 'email', 'whatsapp', 'edad']) {
+  for (const key of ['nombre', 'email', 'whatsapp', 'para']) {
     const input = document.getElementById('f-' + key);
     const bad = errors[key] || (errors.contacto && (key === 'email' || key === 'whatsapp'));
     if (bad) input.setAttribute('aria-invalid', 'true');

@@ -2,6 +2,8 @@
 // No DOM access here, so it runs under node --test.
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+// Who the box is for: a child's age (3 to 7) or an older adult.
+const PARA = new Set(['3', '4', '5', '6', '7', 'mayor']);
 
 const str = (v) => (typeof v === 'string' ? v.trim() : v == null ? '' : String(v).trim());
 
@@ -10,7 +12,7 @@ export function validateRegistration(data = {}) {
   const nombre = str(data.nombre);
   const email = str(data.email);
   const whatsapp = str(data.whatsapp);
-  const edad = str(data.edad);
+  const para = str(data.para);
 
   if (!nombre) errors.nombre = 'Escribe tu nombre.';
 
@@ -24,10 +26,7 @@ export function validateRegistration(data = {}) {
     }
   }
 
-  const n = Number(edad);
-  if (!edad || !Number.isInteger(n) || n < 3 || n > 7) {
-    errors.edad = 'Elige una edad entre 3 y 7 años.';
-  }
+  if (!PARA.has(para)) errors.para = 'Elige para quién sería.';
 
   return { ok: Object.keys(errors).length === 0, errors };
 }

@@ -6,7 +6,7 @@ const valid = {
   nombre: 'Ana Pérez',
   email: 'ana@example.com',
   whatsapp: '',
-  edad: '5',
+  para: '5',
   ciudad: 'Bogotá',
   piloto: false,
 };
@@ -37,12 +37,15 @@ test('accepts colombian whatsapp', () => {
   assert.equal(bad.errors.whatsapp, 'Revisa el número.');
 });
 
-test('edad must be 3 to 7', () => {
-  assert.equal(validateRegistration(make({ edad: '8' })).errors.edad, 'Elige una edad entre 3 y 7 años.');
-  assert.equal(validateRegistration(make({ edad: '2' })).errors.edad, 'Elige una edad entre 3 y 7 años.');
-  assert.equal(validateRegistration(make({ edad: '' })).errors.edad, 'Elige una edad entre 3 y 7 años.');
-  assert.equal(validateRegistration(make({ edad: '3' })).errors.edad, undefined);
-  assert.equal(validateRegistration(make({ edad: '7' })).errors.edad, undefined);
+test('para accepts a child age from 3 to 7 or an older adult', () => {
+  const msg = 'Elige para quién sería.';
+  assert.equal(validateRegistration(make({ para: '8' })).errors.para, msg);
+  assert.equal(validateRegistration(make({ para: '2' })).errors.para, msg);
+  assert.equal(validateRegistration(make({ para: '' })).errors.para, msg);
+  assert.equal(validateRegistration(make({ para: 'abuelo' })).errors.para, msg);
+  assert.equal(validateRegistration(make({ para: '3' })).errors.para, undefined);
+  assert.equal(validateRegistration(make({ para: '7' })).errors.para, undefined);
+  assert.equal(validateRegistration(make({ para: 'mayor' })).errors.para, undefined);
 });
 
 test('does not require consent (privacy flow removed for now)', () => {
