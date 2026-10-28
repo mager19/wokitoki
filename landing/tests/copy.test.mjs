@@ -26,5 +26,10 @@ test('install promise is gone', () => {
   const html = read('index.html');
   assert.doesNotMatch(html, /Nada que instalar/);
   assert.doesNotMatch(html, /Nadie instala nada/);
+  assert.doesNotMatch(html, /sin aplicaciones/i);
   assert.match(html, /app de WoKiToKi/);
+});
+
+test('security FAQ is hedged like its Diseñado status', () => {
+  assert.doesNotMatch(read('index.html'), /Nadie más tiene cómo enviarle mensajes/);
 });
