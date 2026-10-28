@@ -54,7 +54,10 @@ test('limits field lengths to what the database accepts', () => {
   assert.equal(validateRegistration(make({ nombre: long(120) })).errors.nombre, undefined);
   assert.equal(validateRegistration(make({ ciudad: long(121) })).errors.ciudad, 'Máximo 120 caracteres.');
   assert.equal(validateRegistration(make({ email: `${long(250)}@x.co` })).errors.email, 'Revisa el correo.');
-  assert.equal(validateRegistration(make({ whatsapp: '+57 ' + '3'.repeat(27) })).errors.whatsapp, 'Revisa el número.');
+  // 12 digits (valid count) padded with separators past the 30-character limit.
+  assert.equal(validateRegistration(make({ whatsapp: '+57 - 300 - 123 - 45 - 67 - 89 - 0' })).errors.whatsapp, 'Revisa el número.');
+  assert.equal(validateRegistration(make({ whatsapp: '+57 300 123 4567' })).errors.whatsapp, undefined);
+  assert.equal(validateRegistration(make({ ciudad: long(120) })).errors.ciudad, undefined);
 });
 
 test('does not require consent (privacy flow removed for now)', () => {
@@ -133,12 +136,18 @@ test('submitRegistration gives up when Supabase does not answer in time', { time
   const fetch = (url, init) => new Promise((_, reject) => {
     init.signal?.addEventListener('abort', () => reject(init.signal.reason));
   });
-  // AbortSignal.timeout timers do not keep Node alive on their own.
-  const keepAlive = setTimeout(() => {}, 1000);
+  const res = await submitRegistration(make(), { ...config, fetch, timeoutMs: 20 });
+  assert.deepEqual(res, { ok: false });
+});
+
+test('submitRegistration works in browsers without AbortSignal.timeout (Safari < 16)', async () => {
+  const saved = AbortSignal.timeout;
+  AbortSignal.timeout = undefined;
   try {
-    const res = await submitRegistration(make(), { ...config, fetch, timeoutMs: 20 });
-    assert.deepEqual(res, { ok: false });
+    const fetch = fakeFetch();
+    assert.deepEqual(await submitRegistration(make(), { ...config, fetch }), { ok: true });
+    assert.ok(fetch.calls[0].init.signal instanceof AbortSignal);
   } finally {
-    clearTimeout(keepAlive);
+    AbortSignal.timeout = saved;
   }
 });

@@ -8,7 +8,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PARA = new Set(['3', '4', '5', '6', '7', 'mayor']);
 // Mirrors the column checks in supabase/leads.sql, so the database never rejects valid-looking input.
 const MAX = { nombre: 120, ciudad: 120, email: 254, whatsapp: 30 };
-const TOO_LONG = `Máximo ${MAX.nombre} caracteres.`;
+const tooLong = (max) => `Máximo ${max} caracteres.`;
 
 const str = (v) => (typeof v === 'string' ? v.trim() : v == null ? '' : String(v).trim());
 
@@ -22,8 +22,8 @@ export function validateRegistration(data = {}) {
   const ciudad = str(data.ciudad);
 
   if (!nombre) errors.nombre = 'Escribe tu nombre.';
-  else if (nombre.length > MAX.nombre) errors.nombre = TOO_LONG;
-  if (ciudad.length > MAX.ciudad) errors.ciudad = TOO_LONG;
+  else if (nombre.length > MAX.nombre) errors.nombre = tooLong(MAX.nombre);
+  if (ciudad.length > MAX.ciudad) errors.ciudad = tooLong(MAX.ciudad);
 
   if (!email && !whatsapp) {
     errors.contacto = 'Déjanos un correo o un WhatsApp.';
@@ -61,16 +61,21 @@ export async function submitRegistration(data, options = {}) {
     piloto: Boolean(data.piloto),
   };
 
+  // A stalled request must still end in the failure message, not an endless wait.
+  // AbortController + setTimeout instead of AbortSignal.timeout, which Safari < 16 lacks.
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(`${url}/rest/v1/leads`, {
       method: 'POST',
       headers: { apikey: key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify(lead),
-      // A stalled request must still end in the failure message, not an endless wait.
-      signal: AbortSignal.timeout(timeoutMs),
+      signal: controller.signal,
     });
     return { ok: res.ok };
   } catch {
     return { ok: false };
+  } finally {
+    clearTimeout(timer);
   }
 }

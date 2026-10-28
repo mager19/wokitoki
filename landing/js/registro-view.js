@@ -1,6 +1,6 @@
 // DOM view for the registration form. Validation lives in registro.js.
 
-import { validateRegistration, submitRegistration } from './registro.js?v=20261028c';
+import { validateRegistration, submitRegistration } from './registro.js?v=20261028d';
 
 const form = document.getElementById('registro-form');
 const status = document.getElementById('registro-status');
