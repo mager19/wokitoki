@@ -72,3 +72,16 @@ test('landing footer links to the pricing page with a trailing slash', () => {
   assert.match(footer, /href="pricing\/"/);
   assert.doesNotMatch(nav, /pricing/);
 });
+
+test('landing states the 30-day audio retention instead of "voice is not stored"', () => {
+  const html = read('index.html');
+  assert.doesNotMatch(html, /Su voz no se guarda en los registros/);
+  assert.match(html, /cada audio se guarda 30 días y después se borra/);
+});
+
+test('pricing page loads Google Fonts without blocking render', () => {
+  const html = read('pricing/index.html');
+  const fonts = html.match(/<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>/)[0];
+  assert.match(fonts, /media="print" onload="this\.media='all'"/);
+  assert.match(html, /<noscript><link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com/);
+});
