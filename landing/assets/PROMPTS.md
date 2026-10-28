@@ -10,6 +10,9 @@ Paste each prompt (shared blocks already expanded) into nanobanana. Save files u
 | 4 | `familia-nino` | Family cards: child | 1200 x 900 | 4:3 |
 | 5 | `familia-papas` | Family cards: parent | 1200 x 900 | 4:3 |
 | 6 | `familia-abuelos` | Family cards: grandparent | 1200 x 900 | 4:3 |
+| 7 | `mayores-caja` | Family cards, older-adults tab: user | 1200 x 900 | 4:3 |
+| 8 | `mayores-hijos` | Family cards, older-adults tab: adult child | 1200 x 900 | 4:3 |
+| 9 | `mayores-nietos` | Family cards, older-adults tab: grandchild | 1200 x 900 | 4:3 |
 
 ## Shared style block (paste into every prompt)
 
@@ -59,6 +62,25 @@ Composition note: the page crops this into an arch, so keep the subject centred 
 [STYLE block] Two illustrated grandparents sitting close together on a sofa, a grandfather with white moustache and green vest and a grandmother with silver hair and round glasses, both smiling and looking at a smartphone held by the grandmother. The phone shows a generic, unbranded chat with a single plain voice-note bubble (a small play triangle and a wavy line), no logos, no app branding, no text. A cushion in yellow and a small plant drawn simply behind them. Green and pink doodle accents (heart, sound-wave arcs) in the cream space. Horizontal 4:3 composition, couple centred.
 ```
 
+
+## 7. `mayores-caja`: Older-adults card, user (4:3, 1200 x 900 px)
+
+```
+[STYLE block] An illustrated older man in his late seventies with white hair, a short white beard and a violet knitted cardigan, sitting comfortably in a cosy armchair, smiling with confidence and pressing the RED button of a small gadget resting on a side table next to him with one finger. A pair of reading glasses folded on the table and a small potted plant drawn simply nearby. Calm, independent, dignified mood (not frail, not childish). Violet and yellow doodle accents (sound-wave arcs, small star) in the cream space. Horizontal 4:3 composition, subject slightly left of centre. [BOX block]
+```
+
+## 8. `mayores-hijos`: Older-adults card, adult child (4:3, 1200 x 900 px)
+
+```
+[STYLE block] An illustrated woman in her forties (warm brown skin tone, curly hair, blue shirt) placing a small gadget on a kitchen table in front of her elderly mother (silver hair in a bun, round glasses, pink blouse), who smiles and looks at the gadget with interest. The daughter points gently at the buttons, as if showing how simple it is. A teapot and two cups drawn simply on the table. Warm, caring, unhurried mood. Blue and pink doodle accents (heart, squiggle) in the cream space. Horizontal 4:3 composition, both people centred. [BOX block]
+```
+
+## 9. `mayores-nietos`: Older-adults card, grandchild (4:3, 1200 x 900 px)
+
+```
+[STYLE block] An illustrated young woman about 20 years old with an orange sweater and headphones around her neck, sitting on a park bench, smiling and holding a smartphone near her ear, listening to a voice note. The phone shows a generic, unbranded chat with a single plain voice-note bubble (a small play triangle and a wavy line), no logos, no app branding, no text. A simple tree and a bicycle drawn simply behind her. Happy, connected mood. Orange and green doodle accents (sound-wave arcs, small heart) in the cream space. Horizontal 4:3 composition, subject slightly right of centre.
+```
+
 ---
 
 ## Negative prompt (append to every prompt if the tool has a negative field)
@@ -67,6 +89,6 @@ Composition note: the page crops this into an arch, so keep the subject centred 
 
 ## Notes for the user
 
-- Generate 3 to 4 variations of each and pick the set whose line weight and palette match; consistency across all six matters more than any single image.
+- Generate 3 to 4 variations of each and pick the set whose line weight and palette match; consistency across all nine matters more than any single image.
 - If a person comes out looking like a photo, add "flat vector-like children's book illustration" and regenerate.
 - The box must match the closed top shell and outer base of the exploded-view figure, drawn assembled: off-white shell, banana base, red and green buttons, one light. Reject variants with screens, text or logos.

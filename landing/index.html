@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fredoka:wght@500;600;700&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fredoka:wght@500;600;700&display=swap"></noscript>
   <link rel="stylesheet" href="styles/tokens.css?v=20261021b">
-  <link rel="stylesheet" href="styles/main.css?v=20261021b">
+  <link rel="stylesheet" href="styles/main.css?v=20261028a">
   <link rel="stylesheet" href="styles/simulator.css?v=20261021b">
   <link rel="stylesheet" href="styles/registro.css?v=20261021b">
 </head>
@@ -179,7 +179,11 @@
       <img class="doodle d-familia-spiral" src="assets/doodles/spiral.svg" alt="" aria-hidden="true">
       <div class="container">
         <h2 id="familia-title" class="h2 familia__title">Pensada para <span class="hl hl--pink">toda</span> la familia</h2>
-        <div class="cards">
+        <div class="tabs" role="tablist" aria-label="Quién usa la caja" hidden>
+          <button class="tabs__tab" type="button" role="tab" id="tab-ninos" aria-controls="panel-ninos" aria-selected="true">Niños</button>
+          <button class="tabs__tab" type="button" role="tab" id="tab-mayores" aria-controls="panel-mayores" aria-selected="false" tabindex="-1">Adultos mayores</button>
+        </div>
+        <div class="cards" id="panel-ninos" role="tabpanel" aria-labelledby="tab-ninos">
           <article class="card card--a">
             <figure class="ph ph--card ph--orange" style="--ratio: 4 / 3">
               <img src="assets/images/familia-nino.png" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Ilustración: un niño sentado en el piso, a punto de apretar el botón rojo.">
@@ -206,6 +210,35 @@
             </figure>
             <h3 class="card__title">Responden desde <span class="ul ul--green">su WhatsApp</span>.</h3>
             <p>Reciben la voz del niño como nota de voz y contestan igual, desde donde estén.</p>
+          </article>
+        </div>
+        <div class="cards" id="panel-mayores" role="tabpanel" aria-labelledby="tab-mayores">
+          <article class="card card--a">
+            <figure class="ph ph--card ph--violet" style="--ratio: 4 / 3">
+              <img src="assets/images/mayores-caja.png" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Ilustración: un abuelo en su sillón aprieta el botón rojo de la caja para hablar.">
+              <figcaption class="ph__label"><span>Ilustración en camino</span><code>mayores-caja</code></figcaption>
+              <span class="card__tag">Adultos mayores</span>
+            </figure>
+            <h3 class="card__title">Sin pantallas ni <span class="ul ul--violet">letra pequeña</span>.</h3>
+            <p>Dos botones grandes y una luz. No hay aplicación que aprender ni contraseña que recordar.</p>
+          </article>
+          <article class="card card--b">
+            <figure class="ph ph--card ph--blue" style="--ratio: 4 / 3">
+              <img src="assets/images/mayores-hijos.png" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Ilustración: una hija deja la caja lista sobre la mesa de su madre.">
+              <figcaption class="ph__label"><span>Ilustración en camino</span><code>mayores-hijos</code></figcaption>
+              <span class="card__tag">Hijos</span>
+            </figure>
+            <h3 class="card__title">La dejan lista <span class="ul ul--blue">una vez</span>.</h3>
+            <p>Los hijos eligen quién está en su lista. Después solo hay que apretar y hablar.</p>
+          </article>
+          <article class="card card--c">
+            <figure class="ph ph--card ph--orange" style="--ratio: 4 / 3">
+              <img src="assets/images/mayores-nietos.png" loading="lazy" decoding="async" onload="this.parentNode.classList.add('has-img')" onerror="this.remove()" alt="Ilustración: una nieta escucha en su celular la nota de voz de su abuelo.">
+              <figcaption class="ph__label"><span>Ilustración en camino</span><code>mayores-nietos</code></figcaption>
+              <span class="card__tag">Nietos y familia</span>
+            </figure>
+            <h3 class="card__title">Le contestan desde <span class="ul ul--orange">su WhatsApp</span>.</h3>
+            <p>Su voz llega como nota de voz, y la respuesta vuelve a la caja. Nadie instala nada.</p>
           </article>
         </div>
       </div>
@@ -292,6 +325,10 @@
           <details>
             <summary>¿Qué es WoKiToKi?</summary>
             <p>Una caja con dos botones y una luz que permite a un niño de 3 a 7 años enviar y recibir mensajes de voz con su familia, que los recibe y responde desde WhatsApp.</p>
+          </details>
+          <details>
+            <summary>¿Sirve para un adulto mayor?</summary>
+            <p>Sí. Está pensada para niños, pero funciona igual para un abuelo o abuela a quien el celular le resulta complicado: rojo para hablar, verde para escuchar, sin pantalla ni letra pequeña. La familia la deja configurada y le responde desde su WhatsApp.</p>
           </details>
           <details>
             <summary>¿Tiene pantalla?</summary>
@@ -415,6 +452,7 @@
 
   <script type="module" src="js/sim-view.js"></script>
   <script type="module" src="js/registro-view.js"></script>
+  <script type="module" src="js/tabs.js"></script>
   <!-- Anatomy figure (built by figures/wokitoki-box/build.mjs --landing, copied into vendor/): mounts into #figure-mount -->
   <script type="module" src="vendor/wokitoki-figure/wokitoki-figure.js"></script>
 </body>

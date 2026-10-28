@@ -118,6 +118,7 @@ input, textarea { caret-color: var(--btn-red); }
 .ul--orange { text-decoration-color: var(--fam-orange); }
 .ul--blue { text-decoration-color: var(--fam-blue); }
 .ul--green { text-decoration-color: var(--fam-green); }
+.ul--violet { text-decoration-color: var(--fam-violet); }
 
 .txt-accent-red { color: #FF8F80; }
 .txt-accent-green { color: var(--fam-green); }
@@ -312,6 +313,7 @@ input, textarea { caret-color: var(--btn-red); }
 .ph--blue { --tint: var(--fam-blue); }
 .ph--green { --tint: var(--fam-green); }
 .ph--orange { --tint: var(--fam-orange); }
+.ph--violet { --tint: var(--fam-violet); }
 
 .ph--arch { border-radius: 50% / 40%; box-shadow: var(--shadow-lift); }
 .ph--arch .ph__label { bottom: 32%; }
@@ -455,6 +457,32 @@ input, textarea { caret-color: var(--btn-red); }
   margin-top: 2.5rem;
   align-items: start;
 }
+.cards[hidden] { display: none; }
+.tabs {
+  display: inline-flex;
+  gap: 4px;
+  margin-top: 1.5rem;
+  padding: 4px;
+  border-radius: var(--pill);
+  background: var(--cream-deep);
+}
+.tabs[hidden] { display: none; }
+.tabs__tab {
+  padding: 0.55em 1.25em;
+  border: 0;
+  border-radius: var(--pill);
+  background: transparent;
+  color: var(--ink-soft);
+  font: 600 var(--step-0) / 1.2 var(--font-body);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.tabs__tab:hover { color: var(--ink); }
+.tabs__tab[aria-selected="true"] {
+  background: var(--green-dark);
+  color: var(--on-dark);
+}
+.tabs + .cards { margin-top: 2rem; }
 .card--b { margin-top: 72px; }
 .card--c { margin-top: 24px; }
 .card .ph { margin-bottom: 1.25rem; }
